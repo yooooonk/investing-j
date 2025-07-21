@@ -13,7 +13,7 @@ type MenuItem = {
 };
 
 const menu: MenuItem[] = [
-  { label: "Wallet", path: "/wallet", icon: <WalletIcon /> },
+  { label: "Tracker", path: "/tracker", icon: <WalletIcon /> },
   { label: "Market", path: "/market", icon: <MarketIcon /> },
   { label: "Home", path: "/", icon: <HomeIcon /> },
   {
