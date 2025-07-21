@@ -7,4 +7,5 @@ export interface StockItem {
   currentPrice: number;
   averagePurchasePrice: number;
   rateOfReturn: number;
+  isManual?: boolean;
 }
