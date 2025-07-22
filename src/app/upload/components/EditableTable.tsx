@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { StockItem } from "@/type/stock";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Plus, Trash2, CheckCircle2Icon } from "lucide-react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
+import EditableCell from "./EditableCell";
 
 // 수익률 보정 함수
 function fixRateOfReturn(value: number) {
@@ -28,18 +28,6 @@ export default function EditableTable({
     value: string;
   }>({ row: -1, col: null, value: "" });
   // 셀 클릭 시 수정 모드 진입
-  const handleCellClick = (rowIdx: number, col: keyof StockItem) => {
-    setEdit({
-      row: rowIdx,
-      col,
-      value: String(portfolioData[rowIdx][col] ?? ""),
-    });
-  };
-
-  // input 값 변경
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEdit((prev) => ({ ...prev, value: e.target.value }));
-  };
 
   // 수정 완료
   const handleEditComplete = () => {
@@ -61,8 +49,6 @@ export default function EditableTable({
       quantityHeld: 0,
       valuationAmount: 0,
       purchaseAmount: 0,
-      currentPrice: 0,
-      averagePurchasePrice: 0,
       rateOfReturn: 0,
       isManual: true,
     };
@@ -88,11 +74,6 @@ export default function EditableTable({
                   <br />
                   매입금액
                 </th>
-                <th className="px-2 py-1">
-                  현재가
-                  <br />
-                  평균단가
-                </th>
               </tr>
             </thead>
             <tbody>
@@ -100,25 +81,16 @@ export default function EditableTable({
                 <tr key={rowIdx} className="border-t">
                   {/* 종목명 */}
                   <td className="px-2 py-1 align-top">
-                    {edit.row === rowIdx && edit.col === "name" ? (
-                      <Input
-                        value={edit.value}
-                        onChange={handleEditChange}
-                        onBlur={handleEditComplete}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleEditComplete();
-                        }}
-                        autoFocus
-                        className="h-6 text-xs px-1 mb-1 w-24"
-                      />
-                    ) : (
-                      <span
-                        onClick={() => handleCellClick(rowIdx, "name")}
-                        className="cursor-pointer hover:bg-accent px-1 rounded block"
-                      >
-                        {item.name}
-                      </span>
-                    )}
+                    <EditableCell
+                      rowIdx={rowIdx}
+                      colName="name"
+                      edit={edit}
+                      setEdit={setEdit}
+                      item={item}
+                      onEditComplete={handleEditComplete}
+                    >
+                      {item.name}
+                    </EditableCell>
                     <div className="text-muted-foreground text-[10px] mt-1">
                       보유수량: {item.quantityHeld}
                     </div>
@@ -126,138 +98,56 @@ export default function EditableTable({
                   {/* 평가손익 / 수익률 */}
                   <td className="px-2 py-1 align-top text-right">
                     {/* 평가손익 */}
-                    {edit.row === rowIdx && edit.col === "gainLoss" ? (
-                      <Input
-                        value={edit.value}
-                        onChange={handleEditChange}
-                        onBlur={handleEditComplete}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleEditComplete();
-                        }}
-                        autoFocus
-                        className="h-6 text-xs px-1 mb-1 text-right"
-                      />
-                    ) : (
-                      <span
-                        onClick={() => handleCellClick(rowIdx, "gainLoss")}
-                        className="cursor-pointer hover:bg-accent px-1 rounded block text-right"
-                      >
-                        {item.gainLoss.toLocaleString()}
-                      </span>
-                    )}
+                    <EditableCell
+                      rowIdx={rowIdx}
+                      colName="gainLoss"
+                      isNumber
+                      edit={edit}
+                      setEdit={setEdit}
+                      item={item}
+                      onEditComplete={handleEditComplete}
+                    >
+                      {item.gainLoss.toLocaleString()}
+                    </EditableCell>
                     {/* 수익률 */}
-                    {edit.row === rowIdx && edit.col === "rateOfReturn" ? (
-                      <Input
-                        value={edit.value}
-                        onChange={handleEditChange}
-                        onBlur={handleEditComplete}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleEditComplete();
-                        }}
-                        autoFocus
-                        className="h-6 text-xs px-1 mt-1 text-right"
-                      />
-                    ) : (
-                      <span
-                        onClick={() => handleCellClick(rowIdx, "rateOfReturn")}
-                        className="cursor-pointer hover:bg-accent px-1 rounded block mt-1 text-right"
-                      >
-                        {fixRateOfReturn(item.rateOfReturn).toFixed(2)}%
-                      </span>
-                    )}
+                    <EditableCell
+                      rowIdx={rowIdx}
+                      colName="rateOfReturn"
+                      isNumber
+                      edit={edit}
+                      setEdit={setEdit}
+                      item={item}
+                      onEditComplete={handleEditComplete}
+                    >
+                      {fixRateOfReturn(item.rateOfReturn).toFixed(2)}%
+                    </EditableCell>
                   </td>
                   {/* 평가금액 / 매입금액 */}
                   <td className="px-2 py-1 align-top text-right">
                     {/* 평가금액 */}
-                    {edit.row === rowIdx && edit.col === "valuationAmount" ? (
-                      <Input
-                        value={edit.value}
-                        onChange={handleEditChange}
-                        onBlur={handleEditComplete}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleEditComplete();
-                        }}
-                        autoFocus
-                        className="h-6 text-xs px-1 mb-1 text-right"
-                      />
-                    ) : (
-                      <span
-                        onClick={() =>
-                          handleCellClick(rowIdx, "valuationAmount")
-                        }
-                        className="cursor-pointer hover:bg-accent px-1 rounded block text-right"
-                      >
-                        {item.valuationAmount.toLocaleString()}
-                      </span>
-                    )}
+                    <EditableCell
+                      rowIdx={rowIdx}
+                      colName="valuationAmount"
+                      isNumber
+                      edit={edit}
+                      setEdit={setEdit}
+                      item={item}
+                      onEditComplete={handleEditComplete}
+                    >
+                      {item.valuationAmount.toLocaleString()}
+                    </EditableCell>
                     {/* 매입금액 */}
-                    {edit.row === rowIdx && edit.col === "purchaseAmount" ? (
-                      <Input
-                        value={edit.value}
-                        onChange={handleEditChange}
-                        onBlur={handleEditComplete}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleEditComplete();
-                        }}
-                        autoFocus
-                        className="h-6 text-xs px-1 mt-1 text-right"
-                      />
-                    ) : (
-                      <span
-                        onClick={() =>
-                          handleCellClick(rowIdx, "purchaseAmount")
-                        }
-                        className="cursor-pointer hover:bg-accent px-1 rounded block mt-1 text-right"
-                      >
-                        {item.purchaseAmount.toLocaleString()}
-                      </span>
-                    )}
-                  </td>
-                  {/* 현재가 / 평균단가 */}
-                  <td className="px-2 py-1 align-top text-right">
-                    {/* 현재가 */}
-                    {edit.row === rowIdx && edit.col === "currentPrice" ? (
-                      <Input
-                        value={edit.value}
-                        onChange={handleEditChange}
-                        onBlur={handleEditComplete}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleEditComplete();
-                        }}
-                        autoFocus
-                        className="h-6 text-xs px-1 mb-1 text-right"
-                      />
-                    ) : (
-                      <span
-                        onClick={() => handleCellClick(rowIdx, "currentPrice")}
-                        className="cursor-pointer hover:bg-accent px-1 rounded block text-right"
-                      >
-                        {item.currentPrice.toLocaleString()}
-                      </span>
-                    )}
-                    {/* 평균단가 */}
-                    {edit.row === rowIdx &&
-                    edit.col === "averagePurchasePrice" ? (
-                      <Input
-                        value={edit.value}
-                        onChange={handleEditChange}
-                        onBlur={handleEditComplete}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleEditComplete();
-                        }}
-                        autoFocus
-                        className="h-6 text-xs px-1 mt-1 text-right"
-                      />
-                    ) : (
-                      <span
-                        onClick={() =>
-                          handleCellClick(rowIdx, "averagePurchasePrice")
-                        }
-                        className="cursor-pointer hover:bg-accent px-1 rounded block mt-1 text-right"
-                      >
-                        {item.averagePurchasePrice.toLocaleString()}
-                      </span>
-                    )}
+                    <EditableCell
+                      rowIdx={rowIdx}
+                      colName="purchaseAmount"
+                      isNumber
+                      edit={edit}
+                      setEdit={setEdit}
+                      item={item}
+                      onEditComplete={handleEditComplete}
+                    >
+                      {item.purchaseAmount.toLocaleString()}
+                    </EditableCell>
                   </td>
                 </tr>
               ))}
