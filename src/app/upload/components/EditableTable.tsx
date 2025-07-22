@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { StockItem } from "@/type/stock";
+import { Plus, Trash2 } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
-import { Plus, Trash2, CheckCircle2Icon } from "lucide-react";
-import { Alert, AlertTitle } from "@/components/ui/alert";
 import EditableCell from "./EditableCell";
+import SavePortfolioButton from "./SavePortfolioButton";
 
 // 수익률 보정 함수
 function fixRateOfReturn(value: number) {
@@ -20,8 +20,6 @@ export default function EditableTable({
   portfolioData: StockItem[];
   setPortfolioData: Dispatch<SetStateAction<StockItem[]>>;
 }) {
-  const [showAlert, setShowAlert] = useState(false);
-
   const [edit, setEdit] = useState<{
     row: number;
     col: keyof StockItem | null;
@@ -51,6 +49,7 @@ export default function EditableTable({
       purchaseAmount: 0,
       rateOfReturn: 0,
       isManual: true,
+      currency: "KRW",
     };
     setPortfolioData((prev) => [...prev, empty]);
     setEdit({ row: portfolioData.length, col: "name", value: "" });
@@ -196,44 +195,23 @@ export default function EditableTable({
               </Button>
               {portfolioData.length > 0 &&
                 portfolioData[portfolioData.length - 1].isManual && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    aria-label="마지막 행 삭제"
-                    onClick={() => {
-                      setPortfolioData(portfolioData.slice(0, -1));
-                      if (edit.row === portfolioData.length - 1)
-                        setEdit({ row: -1, col: null, value: "" });
-                    }}
-                  >
-                    <Trash2 className="w-3 h-3 text-destructive" />
-                  </Button>
+                  <>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      aria-label="마지막 행 삭제"
+                      onClick={() => {
+                        setPortfolioData(portfolioData.slice(0, -1));
+                        if (edit.row === portfolioData.length - 1)
+                          setEdit({ row: -1, col: null, value: "" });
+                      }}
+                    >
+                      <Trash2 className="w-3 h-3 text-destructive" />
+                    </Button>
+                    <SavePortfolioButton portfolioData={portfolioData} />
+                  </>
                 )}
             </div>
-            <Button
-              onClick={() => {
-                if (typeof window !== "undefined") {
-                  localStorage.setItem(
-                    "investing-won",
-                    JSON.stringify(portfolioData)
-                  );
-                  setShowAlert(true);
-                  setTimeout(() => setShowAlert(false), 2000);
-                }
-              }}
-            >
-              전체 데이터 저장
-            </Button>
-            {showAlert && (
-              <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-full max-w-[180px]">
-                <Alert className="flex flex-row items-center justify-center text-center gap-2">
-                  <CheckCircle2Icon className="text-green-500" />
-                  <AlertTitle className="!col-start-auto !line-clamp-none !min-h-0">
-                    저장 완료
-                  </AlertTitle>
-                </Alert>
-              </div>
-            )}
           </div>
         </div>
       )}

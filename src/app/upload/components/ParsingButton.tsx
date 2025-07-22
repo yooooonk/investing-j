@@ -7,12 +7,15 @@ import Tesseract from "tesseract.js";
 export default function ParsingButton({
   image,
   setItems,
+  isDollar,
+  setIsDollar,
 }: {
   image: File;
   setItems: Dispatch<SetStateAction<StockItem[]>>;
+  isDollar: boolean;
+  setIsDollar: Dispatch<SetStateAction<boolean>>;
 }) {
   const [loading, setLoading] = useState(false);
-  const [isDollar, setIsDollar] = useState(false);
 
   const handleExtractText = async () => {
     setLoading(true);

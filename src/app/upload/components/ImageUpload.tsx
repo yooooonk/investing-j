@@ -8,8 +8,12 @@ import ParsingButton from "./ParsingButton";
 
 export default function ImageUpload({
   setItems,
+  isDollar,
+  setIsDollar,
 }: {
   setItems: Dispatch<SetStateAction<StockItem[]>>;
+  isDollar: boolean;
+  setIsDollar: Dispatch<SetStateAction<boolean>>;
 }) {
   const [image, setImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string>("");
@@ -39,7 +43,14 @@ export default function ImageUpload({
             />
           )}
         </div>
-        {image && <ParsingButton image={image} setItems={setItems} />}
+        {image && (
+          <ParsingButton
+            image={image}
+            setItems={setItems}
+            isDollar={isDollar}
+            setIsDollar={setIsDollar}
+          />
+        )}
       </CardContent>
     </Card>
   );
