@@ -3,18 +3,13 @@
 
 import Title from "@/components/Title";
 import { StockItem } from "@/type/stock";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import EditableTable from "./components/EditableTable";
 import ImageUpload from "./components/ImageUpload";
-import SavePortfolioButton from "./components/SavePortfolioButton";
 
 export default function UploadPage() {
   const [portfoliData, setPortfolioData] = useState<StockItem[]>([]);
   const [isDollar, setIsDollar] = useState(false);
-
-  useEffect(() => {
-    console.log(portfoliData.length);
-  }, [portfoliData]);
 
   return (
     <div className="flex flex-col justify-items-start items-center w-full h-full">
@@ -31,9 +26,8 @@ export default function UploadPage() {
       <EditableTable
         setPortfolioData={setPortfolioData}
         portfolioData={portfoliData}
+        isDollar={isDollar}
       />
-
-      <SavePortfolioButton portfolioData={portfoliData} />
     </div>
   );
 }

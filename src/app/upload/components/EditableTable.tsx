@@ -3,7 +3,7 @@ import { StockItem } from "@/type/stock";
 import { Plus, Trash2 } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import EditableCell from "./EditableCell";
-import SavePortfolioButton from "./SavePortfolioButton";
+import PortfolioActionButtons from "./PortfolioActionButtons";
 
 // 수익률 보정 함수
 function fixRateOfReturn(value: number) {
@@ -16,15 +16,18 @@ function fixRateOfReturn(value: number) {
 export default function EditableTable({
   portfolioData,
   setPortfolioData,
+  isDollar,
 }: {
   portfolioData: StockItem[];
   setPortfolioData: Dispatch<SetStateAction<StockItem[]>>;
+  isDollar: boolean;
 }) {
   const [edit, setEdit] = useState<{
     row: number;
     col: keyof StockItem | null;
     value: string;
   }>({ row: -1, col: null, value: "" });
+
   // 셀 클릭 시 수정 모드 진입
 
   // 수정 완료
@@ -49,7 +52,9 @@ export default function EditableTable({
       purchaseAmount: 0,
       rateOfReturn: 0,
       isManual: true,
-      currency: "KRW",
+      currentPrice: 0,
+      averagePurchasePrice: 0,
+      currency: isDollar ? "USD" : "KRW",
     };
     setPortfolioData((prev) => [...prev, empty]);
     setEdit({ row: portfolioData.length, col: "name", value: "" });
@@ -113,6 +118,7 @@ export default function EditableTable({
                     >
                       {item.gainLoss.toLocaleString()}
                     </EditableCell>
+                    <br />
                     {/* 수익률 */}
                     <EditableCell
                       rowIdx={rowIdx}
@@ -140,6 +146,7 @@ export default function EditableTable({
                     >
                       {item.valuationAmount.toLocaleString()}
                     </EditableCell>
+                    <br />
                     {/* 매입금액 */}
                     <EditableCell
                       rowIdx={rowIdx}
@@ -166,6 +173,7 @@ export default function EditableTable({
                     >
                       {item?.currentPrice?.toLocaleString()}
                     </EditableCell>
+                    <br />
                     {/* 평균단가 */}
                     <EditableCell
                       rowIdx={rowIdx}
@@ -184,7 +192,7 @@ export default function EditableTable({
             </tbody>
           </table>
           <div className="flex justify-between items-center mt-4 gap-2">
-            <div className="flex gap-1">
+            <div className="flex gap-1 w-full">
               <Button
                 variant="outline"
                 size="icon"
@@ -193,6 +201,7 @@ export default function EditableTable({
               >
                 <Plus className="w-5 h-5" />
               </Button>
+
               {portfolioData.length > 0 &&
                 portfolioData[portfolioData.length - 1].isManual && (
                   <>
@@ -208,9 +217,10 @@ export default function EditableTable({
                     >
                       <Trash2 className="w-3 h-3 text-destructive" />
                     </Button>
-                    <SavePortfolioButton portfolioData={portfolioData} />
                   </>
                 )}
+              <div className="flex-1" />
+              <PortfolioActionButtons portfolioData={portfolioData} />
             </div>
           </div>
         </div>

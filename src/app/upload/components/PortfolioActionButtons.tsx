@@ -4,7 +4,7 @@ import { StockItem } from "@/type/stock";
 import { CheckCircle2Icon } from "lucide-react";
 import { useState } from "react";
 
-export default function SavePortfolioButton({
+export default function PortfolioActionButtons({
   portfolioData,
 }: {
   portfolioData: StockItem[];

@@ -43,7 +43,9 @@ export default function EditableCell({
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         autoFocus
-        className={`h-6 text-xs px-1 mb-1 ${isNumber ? "text-right" : ""}`}
+        className={`h-6 text-xs mb-1 ${
+          isNumber ? "text-right w-16 pr-0" : "px-1"
+        }`}
       />
     );
   }
