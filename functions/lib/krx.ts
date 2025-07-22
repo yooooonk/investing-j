@@ -10,7 +10,6 @@ export async function getStockInfo(ticker: string) {
   const response = await axios.get(url);
   // 응답 데이터에서 현재가, 전고점 등 필요한 정보 추출
   return {
-    currentPrice: response.data.currentPrice,
     highPrice: response.data.highPrice,
     // ... 기타 필요한 데이터
   };

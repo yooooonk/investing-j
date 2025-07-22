@@ -6,6 +6,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { parseOcrText } from "@/lib/utils";
 import Tesseract from "tesseract.js";
 import { StockItem } from "@/type/stock";
+// import { Switch } from "@/components/ui/switch"
 
 export default function ImageUpload({
   setItems,
