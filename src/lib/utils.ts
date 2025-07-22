@@ -28,12 +28,15 @@ export function parseOcrText(text: string): StockItem[] {
     // line1: 종목명(공백 포함) + 숫자 3개
     const match1 = line1.match(/(.+?)\s+([\d,\-]+)\s+([\d,\-]+)\s+([\d,\-]+)$/);
     if (!match1) continue;
-    const [, name, gainLoss, valuationAmount] = match1;
+    const [, name, gainLoss, valuationAmount, currentPrice] = match1;
 
     // line2: 오른쪽에서부터 4개 숫자 추출 (평균단가, 매입금액, 수익률, 보유수량)
-    const nums = line2.match(/([\d,\.\-]+)\s+([\d,\.\-]+)\s+([\d,\.\-]+)$/);
+    const nums = line2.match(
+      /([\d,\.\-]+)\s+([\d,\.\-]+)\s+([\d,\.\-]+)\s+([\d,\.\-]+)$/
+    );
     if (!nums) continue;
-    const [, quantityHeld, rateOfReturn, purchaseAmount] = nums;
+    const [, quantityHeld, rateOfReturn, purchaseAmount, averagePurchasePrice] =
+      nums;
 
     items.push({
       name: name.trim(),
@@ -41,6 +44,8 @@ export function parseOcrText(text: string): StockItem[] {
       quantityHeld: Number(quantityHeld.replace(/,/g, "")),
       valuationAmount: Number(valuationAmount.replace(/,/g, "")),
       purchaseAmount: Number(purchaseAmount.replace(/,/g, "")),
+      currentPrice: Number(currentPrice.replace(/,/g, "")),
+      averagePurchasePrice: Number(averagePurchasePrice.replace(/,/g, "")),
       rateOfReturn: Number(rateOfReturn),
     });
   }

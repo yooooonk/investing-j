@@ -4,6 +4,8 @@ export interface StockItem {
   quantityHeld: number;
   valuationAmount: number;
   purchaseAmount: number;
+  currentPrice?: number;
+  averagePurchasePrice?: number;
   rateOfReturn: number;
   isManual?: boolean;
 }

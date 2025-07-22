@@ -74,6 +74,11 @@ export default function EditableTable({
                   <br />
                   매입금액
                 </th>
+                <th className="px-2 py-1">
+                  현재가
+                  <br />
+                  평균단가
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -122,7 +127,7 @@ export default function EditableTable({
                       {fixRateOfReturn(item.rateOfReturn).toFixed(2)}%
                     </EditableCell>
                   </td>
-                  {/* 평가금액 / 매입금액 */}
+                  {/* 현재가 / 평균단가 */}
                   <td className="px-2 py-1 align-top text-right">
                     {/* 평가금액 */}
                     <EditableCell
@@ -147,6 +152,32 @@ export default function EditableTable({
                       onEditComplete={handleEditComplete}
                     >
                       {item.purchaseAmount.toLocaleString()}
+                    </EditableCell>
+                  </td>
+                  <td className="px-2 py-1 align-top text-right">
+                    {/* 현재가 */}
+                    <EditableCell
+                      rowIdx={rowIdx}
+                      colName="currentPrice"
+                      isNumber
+                      edit={edit}
+                      setEdit={setEdit}
+                      item={item}
+                      onEditComplete={handleEditComplete}
+                    >
+                      {item?.currentPrice?.toLocaleString()}
+                    </EditableCell>
+                    {/* 평균단가 */}
+                    <EditableCell
+                      rowIdx={rowIdx}
+                      colName="averagePurchasePrice"
+                      isNumber
+                      edit={edit}
+                      setEdit={setEdit}
+                      item={item}
+                      onEditComplete={handleEditComplete}
+                    >
+                      {item?.averagePurchasePrice?.toLocaleString()}
                     </EditableCell>
                   </td>
                 </tr>
