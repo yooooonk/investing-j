@@ -1,11 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { StockItem } from "@/type/stock";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useState } from "react";
-import { parseOcrText } from "@/lib/utils";
-import Tesseract from "tesseract.js";
-import { StockItem } from "@/type/stock";
+import ParsingButton from "./ParsingButton";
 // import { Switch } from "@/components/ui/switch"
 
 export default function ImageUpload({
@@ -15,7 +13,6 @@ export default function ImageUpload({
 }) {
   const [image, setImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string>("");
-  const [loading, setLoading] = useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -26,15 +23,6 @@ export default function ImageUpload({
     }
   };
 
-  const handleExtractText = async () => {
-    if (!image) return;
-    setLoading(true);
-    const { data } = await Tesseract.recognize(image, "kor+eng");
-
-    const parsed = parseOcrText(data.text);
-    setItems(parsed);
-    setLoading(false);
-  };
   return (
     <Card className="w-full max-w-md h-[45vh]">
       <CardContent className="flex flex-col h-full overflow-hidden gap-4">
@@ -51,11 +39,7 @@ export default function ImageUpload({
             />
           )}
         </div>
-        {imageUrl && (
-          <Button onClick={handleExtractText} disabled={!image || loading}>
-            {loading ? "추출 중..." : "텍스트 추출"}
-          </Button>
-        )}
+        {image && <ParsingButton image={image} setItems={setItems} />}
       </CardContent>
     </Card>
   );

@@ -7,5 +7,6 @@ export interface StockItem {
   currentPrice?: number;
   averagePurchasePrice?: number;
   rateOfReturn: number;
+  currency: "KRW" | "USD";
   isManual?: boolean;
 }
