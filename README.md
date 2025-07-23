@@ -2,7 +2,25 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+### 1. Environment Setup
+
+First, create a `.env.local` file in the project root with your Firebase configuration:
+
+```bash
+cp .env.example .env.local
+```
+
+Then edit `.env.local` with your actual Firebase values from the Firebase Console.
+
+### 2. Install Dependencies
+
+```bash
+npm install
+# or
+yarn install
+```
+
+### 3. Run Development Server
 
 ```bash
 npm run dev

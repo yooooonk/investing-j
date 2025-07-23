@@ -9,4 +9,5 @@ export interface StockItem {
   rateOfReturn: number;
   currency: "KRW" | "USD";
   isManual?: boolean;
+  code: string;
 }

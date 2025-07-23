@@ -55,6 +55,7 @@ export default function EditableTable({
       currentPrice: 0,
       averagePurchasePrice: 0,
       currency: isDollar ? "USD" : "KRW",
+      code: "",
     };
     setPortfolioData((prev) => [...prev, empty]);
     setEdit({ row: portfolioData.length, col: "name", value: "" });
@@ -98,7 +99,7 @@ export default function EditableTable({
                       item={item}
                       onEditComplete={handleEditComplete}
                     >
-                      {item.name}
+                      {item.name}({item.code})
                     </EditableCell>
                     <div className="text-muted-foreground text-[10px] mt-1">
                       보유수량: {item.quantityHeld}
@@ -220,7 +221,10 @@ export default function EditableTable({
                   </>
                 )}
               <div className="flex-1" />
-              <PortfolioActionButtons portfolioData={portfolioData} />
+              <PortfolioActionButtons
+                portfolioData={portfolioData}
+                setPortfolioData={setPortfolioData}
+              />
             </div>
           </div>
         </div>

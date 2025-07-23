@@ -42,4 +42,6 @@ yarn-error.log*
 next-env.d.ts
 
 serviceAccountKey.json
-*.csv 
+# *.csv 
+
+.env.local
