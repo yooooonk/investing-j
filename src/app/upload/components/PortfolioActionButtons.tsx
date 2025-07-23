@@ -2,8 +2,7 @@ import { Button } from "@/components/ui/button";
 import { StockItem } from "@/type/stock";
 import { CheckCircle2Icon } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
-import { fetchCodesByNames } from "../util/firebase/getCode";
-import { PortfolioService } from "@/lib/firebase/portfolioService";
+
 import SaveAlert from "./SaveAlert";
 
 export default function PortfolioActionButtons({
@@ -17,10 +16,22 @@ export default function PortfolioActionButtons({
   const [saving, setSaving] = useState(false);
 
   const handleClickGetTickerCode = async () => {
-    const codes = await fetchCodesByNames(
-      portfolioData.map((item) => item.name)
-    );
-    console.log(codes);
+    // 포트폴리오에 있는 종목명 배열 추출
+    const stocksNameList = portfolioData.map((item) => item.name);
+
+    // 엔드포인트 호출 (POST 방식, 종목명 배열 전달)
+    const res = await fetch("/api/stock", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ stocksNameList }),
+    });
+
+    if (!res.ok) throw new Error("티커 코드 조회 실패");
+
+    // codes: { [종목명]: 코드 } 형태라고 가정
+    const codes = await res.json();
+
+    console.log(codes.data);
     setPortfolioData(
       portfolioData.map((item) => ({
         ...item,
@@ -35,8 +46,12 @@ export default function PortfolioActionButtons({
     setSaving(true);
 
     try {
-      const portfolioService = new PortfolioService();
-      await portfolioService.savePortfolio(portfolioData, "yoonk");
+      // 저장
+      await fetch("/api/portfolio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ portfolioData, portfolioName: "yoonk" }),
+      });
 
       setShowAlert(true);
       setTimeout(() => setShowAlert(false), 3000);
