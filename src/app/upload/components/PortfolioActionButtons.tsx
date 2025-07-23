@@ -1,10 +1,10 @@
-import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { StockItem } from "@/type/stock";
 import { CheckCircle2Icon } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { fetchCodesByNames } from "../util/firebase/getCode";
 import { PortfolioService } from "@/lib/firebase/portfolioService";
+import SaveAlert from "./SaveAlert";
 
 export default function PortfolioActionButtons({
   portfolioData,
@@ -56,16 +56,12 @@ export default function PortfolioActionButtons({
       <Button onClick={() => handleClickSave()} disabled={saving}>
         {saving ? "저장중..." : "전체 데이터 저장"}
       </Button>
-      {showAlert && (
-        <div>
-          <Alert className="flex flex-row items-center justify-center text-center gap-2">
-            <CheckCircle2Icon className="text-green-500" />
-            <AlertTitle className="!col-start-auto !line-clamp-none !min-h-0">
-              저장 완료
-            </AlertTitle>
-          </Alert>
-        </div>
-      )}
+      <SaveAlert
+        show={showAlert}
+        title="저장 완료"
+        icon={<CheckCircle2Icon className="text-green-500" />}
+        bottom="bottom-20"
+      />
     </>
   );
 }
