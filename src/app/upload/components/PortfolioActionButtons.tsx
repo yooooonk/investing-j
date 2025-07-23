@@ -36,12 +36,8 @@ export default function PortfolioActionButtons({
 
     try {
       const portfolioService = new PortfolioService();
-      const portfolioId = await portfolioService.savePortfolio(
-        portfolioData,
-        "yoonk"
-      );
+      await portfolioService.savePortfolio(portfolioData, "yoonk");
 
-      console.log("포트폴리오 저장 완료", portfolioId);
       setShowAlert(true);
       setTimeout(() => setShowAlert(false), 3000);
     } catch (error) {
@@ -53,7 +49,11 @@ export default function PortfolioActionButtons({
   return (
     <>
       <Button onClick={() => handleClickGetTickerCode()}>코드 가져오기</Button>
-      <Button onClick={() => handleClickSave()} disabled={saving}>
+      <Button
+        onClick={() => handleClickSave()}
+        disabled={saving}
+        className="min-w-[120px]"
+      >
         {saving ? "저장중..." : "전체 데이터 저장"}
       </Button>
       <SaveAlert
