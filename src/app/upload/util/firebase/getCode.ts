@@ -1,4 +1,4 @@
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
 const STOCKS_COLLECTION = "stocks";
@@ -16,7 +16,7 @@ export async function fetchCodesByNames(stocksNameList: string[]) {
     );
 
     const querySnapshot = await getDocs(q);
-    console.log("qeursy snapshop", querySnapshot);
+
     querySnapshot.forEach((doc) => {
       const data = doc.data();
       if (typeof data.name === "string" && typeof data.code === "string") {

@@ -4,6 +4,7 @@ import { StockItem } from "@/type/stock";
 import { CheckCircle2Icon } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { fetchCodesByNames } from "../util/firebase/getCode";
+import { PortfolioService } from "@/lib/firebase/portfolioService";
 
 export default function PortfolioActionButtons({
   portfolioData,
@@ -13,6 +14,7 @@ export default function PortfolioActionButtons({
   setPortfolioData: Dispatch<SetStateAction<StockItem[]>>;
 }) {
   const [showAlert, setShowAlert] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const handleClickGetTickerCode = async () => {
     const codes = await fetchCodesByNames(
@@ -27,13 +29,33 @@ export default function PortfolioActionButtons({
     );
   };
 
-  const handleClickSave = () => {
-    console.log("전체 데이터 저장");
+  const handleClickSave = async () => {
+    if (portfolioData.length === 0) return;
+
+    setSaving(true);
+
+    try {
+      const portfolioService = new PortfolioService();
+      const portfolioId = await portfolioService.savePortfolio(
+        portfolioData,
+        "yoonk"
+      );
+
+      console.log("포트폴리오 저장 완료", portfolioId);
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+    } catch (error) {
+      console.error("포트폴리오 저장 실패:", error);
+    } finally {
+      setSaving(false);
+    }
   };
   return (
     <>
       <Button onClick={() => handleClickGetTickerCode()}>코드 가져오기</Button>
-      <Button onClick={() => handleClickSave()}>전체 데이터 저장</Button>
+      <Button onClick={() => handleClickSave()} disabled={saving}>
+        {saving ? "저장중..." : "전체 데이터 저장"}
+      </Button>
       {showAlert && (
         <div>
           <Alert className="flex flex-row items-center justify-center text-center gap-2">

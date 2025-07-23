@@ -33,6 +33,7 @@ export function parseKRWStocks(text: string): StockItem[] {
 
     items.push({
       name: name.trim(),
+      code: "",
       gainLoss: Number(gainLoss.replace(/,/g, "")),
       quantityHeld: Number(quantityHeld.replace(/,/g, "")),
       valuationAmount: Number(valuationAmount.replace(/,/g, "")),
@@ -81,6 +82,7 @@ export function parseUSDStocks(rawText: string): StockItem[] {
     const [, quantityHeld, rateOfReturn, purchaseAmount] = match2;
     items.push({
       name: parsedTicker,
+      code: parsedTicker,
       quantityHeld: Number(quantityHeld.replace(/,/g, "")),
       gainLoss: Number(gainLoss.replace(/,/g, "")),
       rateOfReturn: Number(rateOfReturn),
