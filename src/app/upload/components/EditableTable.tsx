@@ -16,11 +16,11 @@ function fixRateOfReturn(value: number) {
 export default function EditableTable({
   portfolioData,
   setPortfolioData,
-  isDollar,
+  currency,
 }: {
   portfolioData: StockItem[];
   setPortfolioData: Dispatch<SetStateAction<StockItem[]>>;
-  isDollar: boolean;
+  currency: "KRW" | "USD";
 }) {
   const [edit, setEdit] = useState<{
     row: number;
@@ -54,7 +54,7 @@ export default function EditableTable({
       isManual: true,
       currentPrice: 0,
       averagePurchasePrice: 0,
-      currency: isDollar ? "USD" : "KRW",
+      currency: currency,
       code: "",
     };
     setPortfolioData((prev) => [...prev, empty]);

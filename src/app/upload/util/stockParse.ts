@@ -53,8 +53,6 @@ export function parseUSDStocks(rawText: string): StockItem[] {
     .map((line) => line.trim())
     .filter(Boolean);
 
-  console.log(lines);
-
   const items: StockItem[] = [];
 
   for (let i = 2; i < lines.length; i += 2) {
@@ -64,7 +62,6 @@ export function parseUSDStocks(rawText: string): StockItem[] {
     // |가 있어도 되고 없어도 되게 정규식 수정
     const match1 = line1.match(/(.+?)(?:\|\s*)?\s+(-?[\d,]+)\s+([\d,]+)$/);
     if (!match1) {
-      console.log("match1 null at line:", i, line1);
       continue;
     }
     const [, name, gainLoss, valuationAmount] = match1;

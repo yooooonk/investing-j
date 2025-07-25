@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { parseKRWStocks, parseUSDStocks } from "@/app/upload/util/stockParse";
 import { StockItem } from "@/type/stock";
 import { Dispatch, SetStateAction, useState } from "react";
 import Tesseract from "tesseract.js";
@@ -7,13 +6,13 @@ import Tesseract from "tesseract.js";
 export default function ParsingButton({
   image,
   setItems,
-  isDollar,
-  setIsDollar,
+  parseFunction,
+  label,
 }: {
   image: File;
   setItems: Dispatch<SetStateAction<StockItem[]>>;
-  isDollar: boolean;
-  setIsDollar: Dispatch<SetStateAction<boolean>>;
+  parseFunction: (text: string) => StockItem[];
+  label: string;
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -21,31 +20,27 @@ export default function ParsingButton({
     setLoading(true);
     const { data } = await Tesseract.recognize(image, "kor+eng");
 
-    const parsed = isDollar
-      ? parseUSDStocks(data.text)
-      : parseKRWStocks(data.text);
+    const parsed = parseFunction(data.text);
 
-    setItems(parsed);
+    setItems((prev) => {
+      const prevMap = new Map(prev.map((item) => [item.name, item]));
+      parsed.forEach((item) => {
+        prevMap.set(item.name, item); // 있으면 덮어씀, 없으면 추가
+      });
+      return Array.from(prevMap.values());
+    });
     setLoading(false);
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex w-full items-center">
-        <label className="flex items-center gap-1 cursor-pointer select-none text-xs">
-          <input
-            type="checkbox"
-            checked={isDollar}
-            onChange={(e) => setIsDollar(e.target.checked)}
-            className="w-4 h-4"
-          />
-          달러
-        </label>
-        {/* <div className="flex-1" /> */}
-        <Button onClick={handleExtractText} disabled={loading}>
-          {loading ? "추출 중..." : "텍스트 추출"}
-        </Button>
-      </div>
+    <div className="flex w-full items-center justify-center mt-3">
+      <Button
+        className="min-w-[8rem]"
+        onClick={handleExtractText}
+        disabled={loading}
+      >
+        {loading ? "추출 중..." : label}
+      </Button>
     </div>
   );
 }

@@ -17,7 +17,9 @@ export default function PortfolioActionButtons({
 
   const handleClickGetTickerCode = async () => {
     // 포트폴리오에 있는 종목명 배열 추출
-    const stocksNameList = portfolioData.map((item) => item.name);
+    const stocksNameList = portfolioData
+      .filter((item) => item.currency === "KRW")
+      .map((item) => item.name);
 
     // 엔드포인트 호출 (POST 방식, 종목명 배열 전달)
     const res = await fetch("/api/stock", {
@@ -26,17 +28,16 @@ export default function PortfolioActionButtons({
       body: JSON.stringify({ stocksNameList }),
     });
 
-    if (!res.ok) throw new Error("티커 코드 조회 실패");
+    if (!res.ok) throw new Error("종목 코드 조회 실패");
 
     // codes: { [종목명]: 코드 } 형태라고 가정
-    const codes = await res.json();
+    const data = await res.json();
+    const codes = data.data;
 
-    console.log(codes.data);
     setPortfolioData(
-      portfolioData.map((item) => ({
-        ...item,
-        code: codes[item.name],
-      }))
+      portfolioData.map((item) =>
+        item.currency === "KRW" ? { ...item, code: codes[item.name] } : item
+      )
     );
   };
 

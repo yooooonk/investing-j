@@ -5,11 +5,11 @@ import Title from "@/components/Title";
 import { StockItem } from "@/type/stock";
 import { useState } from "react";
 import EditableTable from "./components/EditableTable";
-import ImageUpload from "./components/ImageUpload";
+import PortfolioUpload from "./components/PortfolioUpload";
 
 export default function UploadPage() {
   const [portfoliData, setPortfolioData] = useState<StockItem[]>([]);
-  const [isDollar, setIsDollar] = useState(false);
+  const [currency, setCurrency] = useState<"KRW" | "USD">("KRW");
 
   return (
     <div className="flex flex-col justify-items-start items-center w-full h-full">
@@ -18,15 +18,16 @@ export default function UploadPage() {
           🤖
         </span>
       </Title>
-      <ImageUpload
-        setItems={setPortfolioData}
-        isDollar={isDollar}
-        setIsDollar={setIsDollar}
+
+      <PortfolioUpload
+        setPortfolioData={setPortfolioData}
+        currency={currency}
+        setCurrency={setCurrency}
       />
       <EditableTable
         setPortfolioData={setPortfolioData}
         portfolioData={portfoliData}
-        isDollar={isDollar}
+        currency={currency}
       />
     </div>
   );
