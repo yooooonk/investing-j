@@ -1,7 +1,9 @@
-import React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
+
+import { formatDateWithDay } from "@/lib/date";
+import { GetPortfolioResponse } from "@/type/portfolio";
 
 interface PortfolioItem {
   name: string;
@@ -27,6 +29,7 @@ interface PortfolioSummaryProps {
   mockPortfolioPie: PortfolioPieOrYield;
   mockPortfolioYield: PortfolioPieOrYield;
   mockPortfolioSummary: PortfolioSummaryData;
+  portfolioData: GetPortfolioResponse;
 }
 
 export default function PortfolioSummary({
@@ -35,11 +38,14 @@ export default function PortfolioSummary({
   mockPortfolioPie,
   mockPortfolioYield,
   mockPortfolioSummary,
+  portfolioData,
 }: PortfolioSummaryProps) {
   return (
     <Card className="w-full mb-4">
       <CardHeader>
-        <CardTitle>이번 달</CardTitle>
+        <CardTitle>
+          {formatDateWithDay(portfolioData.portfolio.createdAt)}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-between text-xs text-gray-500 mb-1">

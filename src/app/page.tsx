@@ -7,13 +7,33 @@ import {
 } from "../mock/portfolio";
 import PortfolioSummary from "@/components/PortfolioSummary";
 import PortfolioList from "@/components/PortfolioList";
-import { StockItem } from "@/type/stock";
+import { GetPortfolioResponse } from "@/type/portfolio";
 
 export default function Dashboard() {
   const [tab, setTab] = useState<"비중" | "수익률">("비중");
   const pie = tab === "비중" ? mockPortfolioPie : mockPortfolioYield;
 
-  const [portfolioData, setPortfolioData] = useState<StockItem[]>([]);
+  const [portfolioData, setPortfolioData] = useState<GetPortfolioResponse>({
+    portfolio: {
+      id: "",
+      userId: "",
+      name: "",
+      currency: "KRW",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isActive: true,
+    },
+    snapshot: {
+      id: "",
+      portfolioId: "",
+      date: "",
+      items: [],
+      totalValue: 0,
+      totalGainLoss: 0,
+      totalRateOfReturn: 0,
+      createdAt: new Date(),
+    },
+  });
 
   useEffect(() => {
     // 실제 API 호출
@@ -38,6 +58,7 @@ export default function Dashboard() {
         mockPortfolioPie={mockPortfolioPie}
         mockPortfolioYield={mockPortfolioYield}
         mockPortfolioSummary={mockPortfolioSummary}
+        portfolioData={portfolioData}
       />
       <PortfolioList items={pie.items} tab={tab} />
     </>

@@ -1,37 +1,21 @@
+import { getTodayYYYYMMDD } from "@/lib/date";
 import { db } from "@/lib/firebase";
+import {
+  GetPortfolioResponse,
+  Portfolio,
+  PortfolioSnapshot,
+} from "@/type/portfolio";
+import { StockItem } from "@/type/stock";
 import {
   collection,
   doc,
   getDocs,
+  limit,
+  orderBy,
   query,
   where,
-  orderBy,
-  limit,
   writeBatch,
 } from "firebase/firestore";
-import { StockItem } from "@/type/stock";
-import getTodayYYYYMMDD from "@/lib/getTodayYYYYMMDD";
-
-export interface Portfolio {
-  id: string;
-  userId: string;
-  name: string;
-  currency: "KRW" | "USD";
-  createdAt: Date;
-  updatedAt: Date;
-  isActive: boolean;
-}
-
-export interface PortfolioSnapshot {
-  id: string;
-  portfolioId: string;
-  date: string;
-  items: StockItem[];
-  totalValue: number;
-  totalGainLoss: number;
-  totalRateOfReturn: number;
-  createdAt: Date;
-}
 
 export class PortfolioService {
   private portfoliosCollection = "portfolios";
@@ -105,10 +89,7 @@ export class PortfolioService {
   }
 
   // 최신 포트폴리오 조회
-  async getLatestPortfolio(): Promise<{
-    portfolio: Portfolio;
-    snapshot: PortfolioSnapshot;
-  } | null> {
+  async getLatestPortfolio(): Promise<GetPortfolioResponse | null> {
     const portfolioQuery = query(
       collection(db, this.portfoliosCollection),
       where("isActive", "==", true),
@@ -117,7 +98,14 @@ export class PortfolioService {
     );
     const portfolioSnapshot = await getDocs(portfolioQuery);
     if (portfolioSnapshot.empty) return null;
-    const portfolio = portfolioSnapshot.docs[0].data() as Portfolio;
+
+    const portfolioData = portfolioSnapshot.docs[0].data();
+    const portfolio: Portfolio = {
+      ...portfolioData,
+      createdAt: portfolioData.createdAt?.toDate() || new Date(),
+      updatedAt: portfolioData.updatedAt?.toDate() || new Date(),
+    } as Portfolio;
+
     // 최신 스냅샷 조회
     const snapshotQuery = query(
       collection(db, this.snapshotsCollection),
@@ -127,7 +115,13 @@ export class PortfolioService {
     );
     const snapshotDocs = await getDocs(snapshotQuery);
     if (snapshotDocs.empty) return null;
-    const snapshot = snapshotDocs.docs[0].data() as PortfolioSnapshot;
+
+    const snapshotData = snapshotDocs.docs[0].data();
+    const snapshot: PortfolioSnapshot = {
+      ...snapshotData,
+      createdAt: snapshotData.createdAt?.toDate() || new Date(),
+    } as PortfolioSnapshot;
+
     return { portfolio, snapshot };
   }
 
@@ -145,6 +139,12 @@ export class PortfolioService {
       orderBy("createdAt", "desc")
     );
     const snapshot = await getDocs(querySnapshot);
-    return snapshot.docs.map((doc) => doc.data() as PortfolioSnapshot);
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        ...data,
+        createdAt: data.createdAt?.toDate() || new Date(),
+      } as PortfolioSnapshot;
+    });
   }
 }
