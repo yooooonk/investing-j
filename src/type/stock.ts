@@ -10,4 +10,6 @@ export interface StockItem {
   currency: "KRW" | "USD";
   isManual?: boolean;
   code: string;
+  targetRatio?: number;
+  currentRatio: number;
 }

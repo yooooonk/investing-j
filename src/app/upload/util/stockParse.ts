@@ -19,14 +19,19 @@ export function parseKRWStocks(text: string): StockItem[] {
     if (isHeader(line1) || isHeader(line2)) continue;
 
     // line1: 종목명(공백 포함) + 숫자 3개
-    const match1 = line1.match(/(.+?)\s+([\d,\-]+)\s+([\d,\-]+)\s+([\d,\-]+)$/);
+    const cleanedLine1 = line1.replace(/_/g, "").replace(/\s+/g, " ");
+    const match1 = cleanedLine1.match(
+      /(.+?)\s+([\d,\-]+)\s+([\d,\-]+)\s+([\d,\-]+)$/
+    );
     if (!match1) continue;
     const [, name, gainLoss, valuationAmount, currentPrice] = match1;
 
     // line2: 오른쪽에서부터 4개 숫자 추출 (평균단가, 매입금액, 수익률, 보유수량)
-    const nums = line2.match(
+    const cleanedLine2 = line2.replace(/[^\d,\.\-\s]/g, "");
+    const nums = cleanedLine2.match(
       /([\d,\.\-]+)\s+([\d,\.\-]+)\s+([\d,\.\-]+)\s+([\d,\.\-]+)$/
     );
+
     if (!nums) continue;
     const [, quantityHeld, rateOfReturn, purchaseAmount, averagePurchasePrice] =
       nums;
@@ -42,6 +47,8 @@ export function parseKRWStocks(text: string): StockItem[] {
       averagePurchasePrice: Number(averagePurchasePrice.replace(/,/g, "")),
       rateOfReturn: Number(rateOfReturn),
       currency: "KRW",
+      targetRatio: 0,
+      currentRatio: 0,
     });
   }
   return items;
@@ -88,6 +95,8 @@ export function parseUSDStocks(rawText: string): StockItem[] {
       currentPrice: 0,
       averagePurchasePrice: 0,
       currency: "USD",
+      targetRatio: 0,
+      currentRatio: 0,
     });
   }
 

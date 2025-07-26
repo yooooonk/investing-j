@@ -43,6 +43,7 @@ export class PortfolioService {
     portfolioName: string = "내 포트폴리오"
   ): Promise<string> {
     const batch = writeBatch(db);
+
     const portfolioId = doc(collection(db, this.portfoliosCollection)).id;
     const portfolioRef = doc(db, this.portfoliosCollection, portfolioId);
     const portfolio: Portfolio = {
@@ -55,6 +56,7 @@ export class PortfolioService {
       isActive: true,
     };
     batch.set(portfolioRef, portfolio);
+
     // 스냅샷 생성
     const snapshotId = doc(collection(db, this.snapshotsCollection)).id;
     const snapshotRef = doc(db, this.snapshotsCollection, snapshotId);
@@ -68,11 +70,20 @@ export class PortfolioService {
     );
     const totalRateOfReturn =
       totalValue > 0 ? (totalGainLoss / (totalValue - totalGainLoss)) * 100 : 0;
+
+    // 각 StockItem에 currentRatio 추가
+    const portfolioDataWithRatio = portfolioData.map((item) => ({
+      ...item,
+      currentRatio:
+        totalValue > 0
+          ? Number((item.valuationAmount / totalValue).toFixed(2))
+          : 0,
+    }));
     const snapshot: PortfolioSnapshot = {
       id: snapshotId,
       portfolioId,
       date: getTodayYYYYMMDD(),
-      items: portfolioData,
+      items: portfolioDataWithRatio,
       totalValue,
       totalGainLoss,
       totalRateOfReturn,
