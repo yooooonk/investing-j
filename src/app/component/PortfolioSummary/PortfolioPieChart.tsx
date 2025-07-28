@@ -2,6 +2,8 @@
 import { GetPortfolioResponse } from "@/type/portfolio";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { PieLabelProps } from "recharts/types/polar/Pie";
+import { TabType } from ".";
+import { TAB_VALUES } from "@/app/upload/components/PortfolioUpload";
 
 const COLORS = [
   "#FBBF24", // 기존 - 따뜻한 노란색
@@ -23,6 +25,37 @@ const COLORS = [
 
 const RADIAN = Math.PI / 180;
 
+const getCurrencyRatioData = (portfolioData: GetPortfolioResponse) => {
+  const totalValue = portfolioData.snapshot.totalValue;
+  const totalValueByCurrency = portfolioData.snapshot.items
+    .reduce((acc, item) => {
+      const existingCurrency = acc.find((c) => c.currency === item.currency);
+      if (existingCurrency) {
+        existingCurrency.value += item.valuationAmount;
+      } else {
+        acc.push({
+          currency: item.currency,
+          value: item.valuationAmount,
+          name: item.currency === "KRW" ? "원화" : "달러",
+        });
+      }
+      return acc;
+    }, [] as Array<{ currency: string; value: number; name: string }>)
+    .map((item) => ({
+      ...item,
+      ratio:
+        totalValue > 0
+          ? Number(((item.value / totalValue) * 100).toFixed(2))
+          : 0,
+    }));
+
+  return totalValueByCurrency;
+};
+interface CustomPieLabelProps extends PieLabelProps {
+  tab: TabType;
+  chartType: "currency" | "stock";
+}
+
 const PieLabel = ({
   cx,
   cy,
@@ -30,9 +63,13 @@ const PieLabel = ({
   outerRadius,
   percent,
   name,
-}: PieLabelProps) => {
+  value,
+  chartType = "stock",
+  tab,
+}: CustomPieLabelProps) => {
   // 라벨 위치 조정 (더 바깥쪽으로)
-  const labelRadius = outerRadius + 10;
+  const labelRadius = chartType === "stock" ? outerRadius + 10 : 20;
+
   const labelX = cx + labelRadius * Math.cos(-(midAngle ?? 0) * RADIAN);
   const labelY = cy + labelRadius * Math.sin(-(midAngle ?? 0) * RADIAN);
 
@@ -51,7 +88,8 @@ const PieLabel = ({
         {name.split(" ").length > 1 ? name.split(" ")[1] : name}
       </tspan>
       <tspan x={labelX} dy="1.2em">
-        {((percent ?? 1) * 100).toFixed(0)}%
+        {tab === "ratio" && `${((percent ?? 1) * 100).toFixed(0)}%`}
+        {tab === "amount" && `${value?.toLocaleString()}원`}
       </tspan>
     </text>
   );
@@ -59,35 +97,11 @@ const PieLabel = ({
 
 export default function PortfolioPieChart({
   portfolioData,
+  tab,
 }: {
   portfolioData: GetPortfolioResponse;
+  tab: TabType;
 }) {
-  const getCurrencyRatioData = (portfolioData: GetPortfolioResponse) => {
-    const totalValue = portfolioData.snapshot.totalValue;
-    const totalValueByCurrency = portfolioData.snapshot.items
-      .reduce((acc, item) => {
-        const existingCurrency = acc.find((c) => c.currency === item.currency);
-        if (existingCurrency) {
-          existingCurrency.value += item.valuationAmount;
-        } else {
-          acc.push({
-            currency: item.currency,
-            value: item.valuationAmount,
-            name: item.currency === "KRW" ? "원화" : "달러",
-          });
-        }
-        return acc;
-      }, [] as Array<{ currency: string; value: number; name: string }>)
-      .map((item) => ({
-        ...item,
-        ratio:
-          totalValue > 0
-            ? Number(((item.value / totalValue) * 100).toFixed(2))
-            : 0,
-      }));
-
-    return totalValueByCurrency;
-  };
   return (
     <>
       <div className="flex flex-col items-center">
@@ -95,7 +109,7 @@ export default function PortfolioPieChart({
           <PieChart>
             <Pie
               data={portfolioData.snapshot.items}
-              dataKey="currentRatio"
+              dataKey={tab === "ratio" ? "currentRatio" : "valuationAmount"}
               nameKey="name"
               cx="50%"
               cy="50%"
@@ -103,7 +117,9 @@ export default function PortfolioPieChart({
               outerRadius={90}
               paddingAngle={2}
               labelLine={false}
-              label={PieLabel}
+              label={(props) => (
+                <PieLabel {...props} tab={tab} chartType="stock" />
+              )}
             >
               {portfolioData.snapshot.items.map((stock, idx) => (
                 <Cell key={stock.name} fill={COLORS[idx]} />
@@ -111,13 +127,15 @@ export default function PortfolioPieChart({
             </Pie>
             <Pie
               data={getCurrencyRatioData(portfolioData)}
-              dataKey="ratio"
+              dataKey={tab === "ratio" ? "ratio" : "value"}
               cx="50%"
               cy="50%"
               outerRadius={60}
-              fill="#82ca9d"
+              fill="#FFB6C1"
               labelLine={false}
-              label={PieLabel}
+              label={(props) => (
+                <PieLabel {...props} tab={tab} chartType="currency" />
+              )}
             />
           </PieChart>
         </ResponsiveContainer>

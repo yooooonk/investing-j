@@ -47,10 +47,10 @@ export default function PortfolioSummary({
             </TabsTrigger>
           </TabsList>
           <TabsContent value={TAB_VALUES.RATIO.value}>
-            <PortfolioPieChart portfolioData={portfolioData} />
+            <PortfolioPieChart tab={tab} portfolioData={portfolioData} />
           </TabsContent>
           <TabsContent value={TAB_VALUES.AMOUNT.value}>
-            <PortfolioPieChart portfolioData={portfolioData} />
+            <PortfolioPieChart tab={tab} portfolioData={portfolioData} />
           </TabsContent>
         </Tabs>
       </CardContent>
