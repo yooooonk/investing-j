@@ -30,7 +30,7 @@ export default function PortfolioSummary({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Total />
+        <Total portfolioData={portfolioData} />
         <Tabs value={tab}>
           <TabsList className="w-full grid grid-cols-2 mb-2">
             <TabsTrigger

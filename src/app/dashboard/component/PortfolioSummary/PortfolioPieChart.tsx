@@ -3,25 +3,7 @@ import { GetPortfolioResponse } from "@/type/portfolio";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { PieLabelProps } from "recharts/types/polar/Pie";
 import { TabType } from ".";
-import { TAB_VALUES } from "@/app/upload/components/PortfolioUpload";
-
-const COLORS = [
-  "#FBBF24", // 기존 - 따뜻한 노란색
-  "#60A5FA", // 기존 - 밝은 파란색
-  "#34D399", // 기존 - 밝은 녹색
-  "#A78BFA", // 기존 - 연한 보라색
-  "#F87171", // 빨간색 (따뜻한 톤)
-  "#FB7185", // 분홍색 (따뜻한 톤)
-  "#F59E0B", // 주황색 (따뜻한 톤)
-  "#10B981", // 에메랄드 그린 (차가운 톤)
-  "#06B6D4", // 청록색 (차가운 톤)
-  "#8B5CF6", // 진한 보라색 (차가운 톤)
-  "#EC4899", // 마젠타 (따뜻한 톤)
-  "#14B8A6", // 틸 그린 (차가운 톤)
-  "#F97316", // 오렌지 (따뜻한 톤)
-  "#6366F1", // 인디고 (차가운 톤)
-  "#84CC16", // 라임 그린 (중성 톤)
-];
+import { COLORS } from "@/const/color";
 
 const RADIAN = Math.PI / 180;
 

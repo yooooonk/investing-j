@@ -1,9 +1,8 @@
 "use client";
-import PortfolioList from "@/app/component/PortfolioList";
-import PortfolioSummary from "@/app/component/PortfolioSummary";
+import PortfolioList from "@/app/dashboard/component/PortfolioList";
+import PortfolioSummary from "@/app/dashboard/component/PortfolioSummary";
 import { GetPortfolioResponse } from "@/type/portfolio";
 import { useEffect, useState } from "react";
-import { mockPortfolioPie } from "../mock/portfolio";
 
 export default function Dashboard() {
   const [portfolioData, setPortfolioData] = useState<GetPortfolioResponse>({
@@ -44,7 +43,7 @@ export default function Dashboard() {
   return (
     <>
       <PortfolioSummary portfolioData={portfolioData} />
-      <PortfolioList items={mockPortfolioPie.items} />
+      <PortfolioList portfolioData={portfolioData} />
     </>
   );
 }

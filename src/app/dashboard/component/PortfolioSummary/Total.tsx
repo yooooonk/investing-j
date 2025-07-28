@@ -1,4 +1,10 @@
-const Total = () => {
+import { GetPortfolioResponse } from "@/type/portfolio";
+
+const Total = ({ portfolioData }: { portfolioData: GetPortfolioResponse }) => {
+  const totalValue = portfolioData.snapshot.totalValue;
+  const totalGainLoss = portfolioData.snapshot.totalGainLoss;
+  const totalRateOfReturn = portfolioData.snapshot.totalRateOfReturn;
+
   return (
     <>
       <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
