@@ -9,10 +9,9 @@ interface PortfolioItem {
 
 interface PortfolioListProps {
   items: PortfolioItem[];
-  tab: "비중" | "수익률";
 }
 
-export default function PortfolioList({ items, tab }: PortfolioListProps) {
+export default function PortfolioList({ items }: PortfolioListProps) {
   return (
     <section className="w-full mb-4">
       {items.map((item) => (
@@ -25,11 +24,7 @@ export default function PortfolioList({ items, tab }: PortfolioListProps) {
           <div className="w-16 text-xs text-gray-500 text-right">
             {item.percent}%
           </div>
-          <div className="w-24 text-xs text-right font-bold">
-            {tab === "비중"
-              ? item.value.toLocaleString() + "원"
-              : (item.value > 0 ? "+" : "") + item.value + "%"}
-          </div>
+          <div className="w-24 text-xs text-right font-bold">dd</div>
         </div>
       ))}
     </section>

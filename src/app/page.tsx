@@ -1,18 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
-import {
-  mockPortfolioPie,
-  mockPortfolioYield,
-  mockPortfolioSummary,
-} from "../mock/portfolio";
-import PortfolioSummary from "@/components/PortfolioSummary";
-import PortfolioList from "@/components/PortfolioList";
+import PortfolioList from "@/app/component/PortfolioList";
+import PortfolioSummary from "@/app/component/PortfolioSummary";
 import { GetPortfolioResponse } from "@/type/portfolio";
+import { useEffect, useState } from "react";
+import { mockPortfolioPie } from "../mock/portfolio";
 
 export default function Dashboard() {
-  const [tab, setTab] = useState<"비중" | "수익률">("비중");
-  const pie = tab === "비중" ? mockPortfolioPie : mockPortfolioYield;
-
   const [portfolioData, setPortfolioData] = useState<GetPortfolioResponse>({
     portfolio: {
       id: "",
@@ -40,8 +33,6 @@ export default function Dashboard() {
     fetch("/api/portfolio")
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
-
         setPortfolioData(data);
       })
       .catch((err) => {
@@ -52,15 +43,8 @@ export default function Dashboard() {
 
   return (
     <>
-      <PortfolioSummary
-        tab={tab}
-        setTab={setTab}
-        mockPortfolioPie={mockPortfolioPie}
-        mockPortfolioYield={mockPortfolioYield}
-        mockPortfolioSummary={mockPortfolioSummary}
-        portfolioData={portfolioData}
-      />
-      <PortfolioList items={pie.items} tab={tab} />
+      <PortfolioSummary portfolioData={portfolioData} />
+      <PortfolioList items={mockPortfolioPie.items} />
     </>
   );
 }
