@@ -14,7 +14,7 @@ export default function PortfolioList({
         <div className="flex-1 text-sm font-medium p-0.5 text-center">
           종목명
         </div>
-        <div className="w-16 text-xs text-gray-500 text-right">수익률</div>
+        <div className="w-16 text-xs text-right">비중</div>
         <div className="w-24 text-xs text-right font-bold">평가 금액</div>
       </div>
       {PortfolioList.map((stock, idx) => (
@@ -25,7 +25,10 @@ export default function PortfolioList({
           />
           <div className="flex-1 text-sm font-medium">{stock.name}</div>
           <div className="w-16 text-xs text-gray-500 text-right">
-            {stock.currentRatio}%
+            {stock.currentRatio * 100}%
+          </div>
+          <div className="w-24 text-xs text-right font-bold">
+            {stock.rateOfReturn} %
           </div>
           <div className="w-24 text-xs text-right font-bold">
             {stock.valuationAmount.toLocaleString()} 원
@@ -36,9 +39,7 @@ export default function PortfolioList({
         <div className="flex-1 text-sm font-medium p-0.5 text-center">
           계좌 합계
         </div>
-        <div className="w-16 text-xs text-gray-500 text-right">
-          {portfolioData.snapshot.totalRateOfReturn.toFixed(2)}%
-        </div>
+
         <div className="w-24 text-xs text-right font-bold">
           {portfolioData.snapshot.totalValue.toLocaleString()} 원
         </div>

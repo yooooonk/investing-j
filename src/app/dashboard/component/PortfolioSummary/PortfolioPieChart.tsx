@@ -1,9 +1,9 @@
 "use client";
+import { PortfolioProps, TabType } from "@/app/page";
+import { COLORS } from "@/const/color";
 import { GetPortfolioResponse } from "@/type/portfolio";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { PieLabelProps } from "recharts/types/polar/Pie";
-import { TabType } from ".";
-import { COLORS } from "@/const/color";
 
 const RADIAN = Math.PI / 180;
 
@@ -80,14 +80,11 @@ const PieLabel = ({
 export default function PortfolioPieChart({
   portfolioData,
   tab,
-}: {
-  portfolioData: GetPortfolioResponse;
-  tab: TabType;
-}) {
+}: PortfolioProps) {
   return (
     <>
       <div className="flex flex-col items-center">
-        <ResponsiveContainer width={350} height={350}>
+        <ResponsiveContainer width={350} height={280}>
           <PieChart>
             <Pie
               data={portfolioData.snapshot.items}
