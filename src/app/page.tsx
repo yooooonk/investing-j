@@ -1,8 +1,22 @@
 "use client";
 import PortfolioList from "@/app/dashboard/component/PortfolioList";
 import PortfolioSummary from "@/app/dashboard/component/PortfolioSummary";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatDateWithDay } from "@/lib/date";
 import { GetPortfolioResponse } from "@/type/portfolio";
 import { useEffect, useState } from "react";
+import Total from "./dashboard/component/Total";
+
+export interface PortfolioProps {
+  portfolioData: GetPortfolioResponse;
+  tab: TabType;
+}
+export const TAB_VALUES = {
+  RATIO: { value: "ratio", label: "비중" },
+  AMOUNT: { value: "amount", label: "금액" },
+} as const;
+
+export type TabType = (typeof TAB_VALUES)[keyof typeof TAB_VALUES]["value"]; //
 
 export default function Dashboard() {
   const [portfolioData, setPortfolioData] = useState<GetPortfolioResponse>({
@@ -26,6 +40,7 @@ export default function Dashboard() {
       createdAt: new Date(),
     },
   });
+  const [tab, setTab] = useState<TabType>(TAB_VALUES.RATIO.value);
 
   useEffect(() => {
     // 실제 API 호출
@@ -42,8 +57,22 @@ export default function Dashboard() {
 
   return (
     <>
-      <PortfolioSummary portfolioData={portfolioData} />
-      <PortfolioList portfolioData={portfolioData} />
+      <Card className="w-full mb-4">
+        <CardHeader>
+          <CardTitle>
+            {formatDateWithDay(portfolioData.portfolio.createdAt)}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Total portfolioData={portfolioData} />
+        </CardContent>
+      </Card>
+      <PortfolioSummary
+        tab={tab}
+        setTab={setTab}
+        portfolioData={portfolioData}
+      />
+      <PortfolioList portfolioData={portfolioData} tab={tab} />
     </>
   );
 }
