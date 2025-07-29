@@ -16,10 +16,12 @@ import {
   where,
   writeBatch,
 } from "firebase/firestore";
+import { TargetRatioService } from "./targetRatioService";
 
 export class PortfolioService {
   private portfoliosCollection = "portfolios";
   private snapshotsCollection = "portfolio_snapshots";
+  private targetRatioService = new TargetRatioService();
 
   // 포트폴리오 저장
   async savePortfolio(
@@ -88,7 +90,7 @@ export class PortfolioService {
     return portfolioId;
   }
 
-  // 최신 포트폴리오 조회
+  // 최신 포트폴리오 조회 (목표비중 포함)
   async getLatestPortfolio(): Promise<GetPortfolioResponse | null> {
     const portfolioQuery = query(
       collection(db, this.portfoliosCollection),
@@ -122,7 +124,10 @@ export class PortfolioService {
       createdAt: snapshotData.createdAt?.toDate() || new Date(),
     } as PortfolioSnapshot;
 
-    return { portfolio, snapshot };
+    // 목표비중 조회
+    const targetRatios = await this.targetRatioService.getTargetRatios();
+
+    return { portfolio, snapshot, targetRatios };
   }
 
   // 포트폴리오 히스토리 조회

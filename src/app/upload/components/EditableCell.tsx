@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { StockItem } from "@/type/stock";
-import { Dispatch, SetStateAction, ReactNode } from "react";
+import { Dispatch, ReactNode, SetStateAction } from "react";
 
 export default function EditableCell({
   rowIdx,

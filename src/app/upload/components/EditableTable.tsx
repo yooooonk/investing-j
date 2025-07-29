@@ -56,6 +56,8 @@ export default function EditableTable({
       averagePurchasePrice: 0,
       currency: currency,
       code: "",
+      currentRatio: 0,
+      targetRatio: 0,
     };
     setPortfolioData((prev) => [...prev, empty]);
     setEdit({ row: portfolioData.length, col: "name", value: "" });
