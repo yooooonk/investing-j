@@ -2,6 +2,7 @@
 
 import Title from "@/components/Title";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
 
 export default function TrackerPage() {
   const handleClickSlackTest = async () => {
@@ -19,7 +20,7 @@ export default function TrackerPage() {
 
     // Next.js API 라우트를 통해 호출
     const response = await fetch(
-      `/api/stock/price-history?stockCode=${stockCode}&startDate=${startDate}&endDate=${endDate}`,
+      `/api/stock/stop-loss?stockCode=${stockCode}&startDate=${startDate}&endDate=${endDate}`,
       {
         method: "GET",
       }
@@ -36,16 +37,20 @@ export default function TrackerPage() {
 
   const createKISToken = async () => {
     try {
-      const response = await fetch("/api/kis/create-token", {
+      // const response = await fetch("/api/kis/create-token", {
+      //   method: "POST",
+      // });
+
+      const response = await axios.post("/api/kis/auth", {
         method: "POST",
       });
 
-      if (!response.ok) {
-        console.error("토큰 생성 실패:", response.statusText);
+      if (!response) {
+        console.error("토큰 생성 실패:", response);
         return;
       }
 
-      const data = await response.json();
+      const data = response.data;
       console.log("KIS 토큰 생성 성공:", data);
     } catch (error) {
       console.error("토큰 생성 에러:", error);

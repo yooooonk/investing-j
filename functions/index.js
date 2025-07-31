@@ -34,7 +34,7 @@ export const createKISToken = onRequest(
   }
 );
 
-// 기존 함수
+// 주식 일별 시세 조회 함수
 export const getDailyPriceHistory = onRequest(
   {
     cors: true,
@@ -47,6 +47,7 @@ export const getDailyPriceHistory = onRequest(
 
       const { stockCode, startDate, endDate } = request.query;
 
+      // 필수 파라미터 검증
       if (!stockCode || !startDate || !endDate) {
         console.log("필수 파라미터 누락:", { stockCode, startDate, endDate });
         response.status(400).json({
@@ -57,6 +58,8 @@ export const getDailyPriceHistory = onRequest(
 
       console.log("파라미터 검증 통과:", { stockCode, startDate, endDate });
 
+      // KIS API 호출
+      console.log("KIS API 호출 시작");
       const priceHistory = await KISService.getDailyPriceHistory(
         stockCode,
         startDate,
@@ -72,11 +75,19 @@ export const getDailyPriceHistory = onRequest(
       console.log("=== getDailyPriceHistory 함수 성공 ===");
     } catch (error) {
       console.error("=== getDailyPriceHistory 함수 에러 ===");
+      console.error("에러 타입:", typeof error);
       console.error("에러 메시지:", error.message);
+      console.error("에러 스택:", error.stack);
+      console.error("전체 에러 객체:", JSON.stringify(error, null, 2));
 
+      // 에러 응답에 더 자세한 정보 포함
       response.status(500).json({
         success: false,
         error: error.message || "Unknown error occurred",
+        errorType: typeof error,
+        errorStack:
+          process.env.NODE_ENV === "development" ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
       });
     }
   }

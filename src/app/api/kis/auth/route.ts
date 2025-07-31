@@ -1,13 +1,14 @@
-import { NextResponse } from "next/server";
 import { KISAuthService } from "@/services/kisAuthService";
+import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function POST() {
   try {
     // OAuth 인증 URL 생성
-    const authUrl = KISAuthService.getAuthUrl();
+    const tokenInfo = await KISAuthService.createToken();
 
     // 한국투자증권 로그인 페이지로 리다이렉트
-    return NextResponse.redirect(authUrl);
+    // return NextResponse.redirect(authUrl);
+    console.log(tokenInfo);
   } catch (error) {
     console.error("KIS OAuth auth error:", error);
 

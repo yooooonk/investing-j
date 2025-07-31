@@ -21,6 +21,14 @@ const KIS_CONFIG = {
   ACCOUNT_CODE: process.env.KIS_ACCOUNT_CODE,
 };
 
+console.log("KIS_CONFIG 확인:", {
+  BASE_URL: KIS_CONFIG.BASE_URL,
+  APP_KEY: KIS_CONFIG.APP_KEY ? "설정됨" : "설정되지 않음",
+  APP_SECRET: KIS_CONFIG.APP_SECRET ? "설정됨" : "설정되지 않음",
+  ACCOUNT_NO: KIS_CONFIG.ACCOUNT_NO ? "설정됨" : "설정되지 않음",
+  ACCOUNT_CODE: KIS_CONFIG.ACCOUNT_CODE ? "설정됨" : "설정되지 않음",
+});
+
 export class KISService {
   static TOKEN_DOC_ID = "kis_token";
 
@@ -162,26 +170,41 @@ export class KISService {
 
   // 4. API 요청 헤더 생성
   static async getAuthHeaders() {
-    const token = await this.getValidToken();
+    try {
+      console.log("=== getAuthHeaders 시작 ===");
+      const token = await this.getValidToken();
+      console.log("토큰 획득 완료, 길이:", token.length);
 
-    return {
-      "Content-Type": "application/json",
-      authorization: `Bearer ${token}`,
-      appkey: KIS_CONFIG.APP_KEY,
-      appsecret: KIS_CONFIG.APP_SECRET,
-      tr_id: "FHKST01010100",
-      custtype: "P",
-    };
+      const headers = {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+        appkey: KIS_CONFIG.APP_KEY,
+        appsecret: KIS_CONFIG.APP_SECRET,
+        tr_id: "FHKST01010100",
+        custtype: "P",
+      };
+
+      console.log("헤더 생성 완료:", {
+        "Content-Type": headers["Content-Type"],
+        authorization: "Bearer [HIDDEN]",
+        appkey: headers.appkey ? "설정됨" : "설정되지 않음",
+        appsecret: headers.appsecret ? "설정됨" : "설정되지 않음",
+        tr_id: headers.tr_id,
+        custtype: headers.custtype,
+      });
+
+      return headers;
+    } catch (error) {
+      console.error("getAuthHeaders 에러:", error);
+      throw error;
+    }
   }
 
   // 5. 주식 일별 시세 조회 (특정 기간)
   static async getDailyPriceHistory(stockCode, startDate, endDate) {
     try {
-      console.log("getDailyPriceHistory 시작:", {
-        stockCode,
-        startDate,
-        endDate,
-      });
+      console.log("=== getDailyPriceHistory 시작 ===");
+      console.log("파라미터:", { stockCode, startDate, endDate });
 
       const headers = await this.getAuthHeaders();
       console.log("인증 헤더 생성 완료");
@@ -191,7 +214,14 @@ export class KISService {
         `FID_COND_MRKT_DIV_CODE=J&FID_INPUT_ISCD=${stockCode}&FID_INPUT_DATE_1=${startDate}&FID_INPUT_DATE_2=${endDate}&FID_VOL_CNT=`;
 
       console.log("KIS API URL:", url);
-      console.log("요청 헤더:", headers);
+      console.log("요청 헤더:", {
+        "Content-Type": headers["Content-Type"],
+        authorization: headers.authorization ? "Bearer [HIDDEN]" : "없음",
+        appkey: headers.appkey ? "설정됨" : "설정되지 않음",
+        appsecret: headers.appsecret ? "설정됨" : "설정되지 않음",
+        tr_id: headers.tr_id,
+        custtype: headers.custtype,
+      });
 
       const response = await fetch(url, {
         method: "GET",
@@ -216,10 +246,21 @@ export class KISService {
       }
 
       const data = await response.json();
-      console.log("KIS API 응답 데이터:", data);
+      console.log("KIS API 응답 데이터:", {
+        rt_cd: data.rt_cd,
+        msg1: data.msg1,
+        msg_cd: data.msg_cd,
+        output_length: data.output ? data.output.length : 0,
+        full_response: data, // 전체 응답 로깅
+      });
 
       if (data.rt_cd !== "0") {
-        throw new Error(`API Error: ${data.msg1}`);
+        console.error("KIS API 에러:", {
+          rt_cd: data.rt_cd,
+          msg1: data.msg1,
+          msg_cd: data.msg_cd,
+        });
+        throw new Error(`API Error: ${data.msg1} (코드: ${data.msg_cd})`);
       }
 
       const output = data.output;
@@ -236,7 +277,10 @@ export class KISService {
         volume: parseInt(String(item.cntg_vol)) || 0,
       }));
     } catch (error) {
-      console.error("getDailyPriceHistory 에러:", error);
+      console.error("=== getDailyPriceHistory 에러 ===");
+      console.error("에러 타입:", typeof error);
+      console.error("에러 메시지:", error.message);
+      console.error("에러 스택:", error.stack);
       throw error;
     }
   }
