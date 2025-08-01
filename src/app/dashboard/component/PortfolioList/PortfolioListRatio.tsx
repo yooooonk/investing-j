@@ -14,12 +14,54 @@ export default function PortfolioList({
 
   const [ratioCalcData, setRatioCalcData] =
     useState<StockItem[]>(portfolioList);
+  const [calTotalAmount, setCalTotalAmount] = useState(
+    portfolioData.snapshot.totalValue ?? 0
+  );
+  const [saveLoading, setSaveLoading] = useState(false);
 
   const [edit, setEdit] = useState<{
     row: number;
     col: keyof StockItem | null;
     value: string;
   }>({ row: -1, col: null, value: "" });
+
+  const handleClickSaveButton = async () => {
+    setSaveLoading(true);
+    const reqData = ratioCalcData.map((stock) => ({
+      stockCode: stock.code,
+      stockName: stock.name,
+      targetRatio: stock.targetRatio,
+    }));
+
+    try {
+      const response = await fetch("/api/target-ratio", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          targetRatios: reqData,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.ok) {
+        console.log(
+          "목표 비중이 성공적으로 저장되었습니다:",
+          result.targetRatioIds
+        );
+        // 성공 메시지 표시 또는 다른 UI 업데이트
+      } else {
+        console.error("목표 비중 저장 실패:", result.error);
+        // 에러 메시지 표시
+      }
+    } catch (error) {
+      console.error("목표 비중 저장 중 오류 발생:", error);
+      // 에러 메시지 표시
+    }
+    setSaveLoading(false);
+  };
 
   // 수정 완료
   const handleEditComplete = () => {
@@ -47,10 +89,10 @@ export default function PortfolioList({
           <div className="flex-1 text-sm font-medium p-0.5 text-center">
             종목명
           </div>
-
-          <div className="flex-1 w-3 text-xs text-center">목표 비중</div>
-          <div className="flex-1 w-3 text-xs text-center">비중</div>
+          <div className="w-16 text-xs text-center">목표 비중</div>
+          <div className="w-16 text-xs text-center">비중</div>
           <div className="w-24 text-xs text-right font-bold">평가 금액</div>
+          <div className="w-24 text-xs text-right">비중 차이</div>
         </div>
         {ratioCalcData.map((stock, idx) => (
           <div key={stock.name} className="flex items-center mb-2">
@@ -72,11 +114,18 @@ export default function PortfolioList({
                 {stock.targetRatio ?? 0 * 100}%
               </EditableCell>
             </div>
-            <div className="w-24 text-xs text-right text-gray-500">
+            <div className="w-16 text-xs text-right text-gray-500">
               {stock.currentRatio * 100}%
             </div>
             <div className="w-24 text-xs text-right font-bold">
               {stock.valuationAmount.toLocaleString()} 원
+            </div>
+            <div className="w-24 text-xs text-right font-bold">
+              {(
+                portfolioData.snapshot.totalValue * (stock.targetRatio ?? 0) -
+                stock.valuationAmount
+              ).toLocaleString()}
+              원
             </div>
           </div>
         ))}
@@ -85,21 +134,28 @@ export default function PortfolioList({
           <div className="flex-1 text-sm font-medium p-0.5 text-center">
             합계
           </div>
-          <div className="w-24 text-xs text-right text-gray-500">
-            {ratioCalcData.reduce(
-              (acc, curr) => acc + (curr.targetRatio ?? 0),
-              0
-            )}
+          <div className="w-16 text-xs text-right text-gray-500">
+            {(
+              ratioCalcData.reduce(
+                (acc, curr) => acc + (curr.targetRatio ?? 0),
+                0
+              ) * 100
+            ).toFixed(2)}
             %
           </div>
-          <div className="w-24 text-xs text-right text-gray-500">100%</div>
+          <div className="w-16 text-xs text-right text-gray-500">100%</div>
+          <div className="w-24 text-xs text-right font-bold">
+            {portfolioData.snapshot.totalValue.toLocaleString()} 원
+          </div>
           <div className="w-24 text-xs text-right font-bold">
             {portfolioData.snapshot.totalValue.toLocaleString()} 원
           </div>
         </div>
       </section>
       <div className="flex justify-end gap-2">
-        <Button>목표 비중 저장</Button>
+        <Button onClick={handleClickSaveButton}>
+          {saveLoading ? "저장 중.." : "목표 비중 저장"}
+        </Button>
         <Button>비중 계산기</Button>
       </div>
     </>
