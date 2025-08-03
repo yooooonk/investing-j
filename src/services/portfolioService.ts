@@ -127,7 +127,21 @@ export class PortfolioService {
     // 목표비중 조회
     const targetRatios = await this.targetRatioService.getTargetRatios();
 
-    return { portfolio, snapshot, targetRatios };
+    // snapshot.items에 targetRatio 매핑
+    const itemsWithTargetRatio = snapshot.items.map((item) => {
+      const targetRatio = targetRatios.find((tr) => tr.stockCode === item.code);
+      return {
+        ...item,
+        targetRatio: targetRatio?.targetRatio || 0,
+      };
+    });
+
+    const snapshotWithTargetRatio = {
+      ...snapshot,
+      items: itemsWithTargetRatio,
+    };
+
+    return { portfolio, snapshot: snapshotWithTargetRatio };
   }
 
   // 포트폴리오 히스토리 조회

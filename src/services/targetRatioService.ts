@@ -78,7 +78,7 @@ export class TargetRatioService {
         userId,
         stockCode: item.stockCode,
         stockName: item.stockName,
-        targetRatio: item.targetRatio,
+        targetRatio: item.targetRatio * 0.01,
         createdAt: new Date(),
         updatedAt: new Date(),
       };

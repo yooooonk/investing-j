@@ -111,7 +111,7 @@ export default function PortfolioList({
                 item={stock}
                 onEditComplete={handleEditComplete}
               >
-                {stock.targetRatio ?? 0 * 100}%
+                {((stock.targetRatio ?? 0) * 100).toFixed(0)}%
               </EditableCell>
             </div>
             <div className="w-16 text-xs text-right text-gray-500">
@@ -135,20 +135,21 @@ export default function PortfolioList({
             합계
           </div>
           <div className="w-16 text-xs text-right text-gray-500">
-            {(
-              ratioCalcData.reduce(
-                (acc, curr) => acc + (curr.targetRatio ?? 0),
-                0
-              ) * 100
-            ).toFixed(2)}
+            {/* 목표 비중 */}
+            {ratioCalcData.reduce(
+              (acc, curr) => acc + (curr.targetRatio ?? 0),
+              0
+            ) * 100}
             %
           </div>
           <div className="w-16 text-xs text-right text-gray-500">100%</div>
           <div className="w-24 text-xs text-right font-bold">
+            {/* 평가금액 */}
             {portfolioData.snapshot.totalValue.toLocaleString()} 원
           </div>
           <div className="w-24 text-xs text-right font-bold">
-            {portfolioData.snapshot.totalValue.toLocaleString()} 원
+            {/* 비중 차이  */}
+            {portfolioData.snapshot.totalValue.toFixed(0).toLocaleString()} 원
           </div>
         </div>
       </section>
