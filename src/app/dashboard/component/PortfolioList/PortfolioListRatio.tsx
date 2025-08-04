@@ -1,4 +1,5 @@
 import EditableCell from "@/app/upload/components/EditableCell";
+import SimpleEditableCell from "@/app/upload/components/SimpleEditableCell";
 import { Button } from "@/components/ui/button";
 import { COLORS } from "@/const/color";
 import { GetPortfolioResponse } from "@/type/portfolio";
@@ -14,12 +15,10 @@ export default function PortfolioList({
 
   const [ratioCalcData, setRatioCalcData] =
     useState<StockItem[]>(portfolioList);
-  const [calTotalAmount, setCalTotalAmount] = useState(
-    portfolioData.snapshot.totalValue ?? 0
-  );
+  const [calTotalAmount, setCalTotalAmount] = useState(0);
   const [saveLoading, setSaveLoading] = useState(false);
 
-  const [edit, setEdit] = useState<{
+  const [editTargetRatio, setEditTargetRatio] = useState<{
     row: number;
     col: keyof StockItem | null;
     value: string;
@@ -64,22 +63,30 @@ export default function PortfolioList({
   };
 
   // 수정 완료
-  const handleEditComplete = () => {
-    if (edit.row === -1 || !edit.col) return;
-    console.log(edit);
+  const handleEditCompleteTargetRatio = () => {
+    if (editTargetRatio.row === -1 || !editTargetRatio.col) return;
+    console.log(editTargetRatio);
     const newItems = [...ratioCalcData];
-    let value: string | number = edit.value;
+    let value: string | number = editTargetRatio.value;
     // 숫자 필드는 숫자로 변환
-    if (edit.col !== "name") value = Number(value.replace(/,/g, ""));
+    if (editTargetRatio.col !== "name") value = Number(value.replace(/,/g, ""));
 
-    newItems[edit.row] = { ...newItems[edit.row], [edit.col]: value };
+    newItems[editTargetRatio.row] = {
+      ...newItems[editTargetRatio.row],
+      [editTargetRatio.col]: value,
+    };
 
     setRatioCalcData(newItems);
-    setEdit({ row: -1, col: null, value: "" });
+    setEditTargetRatio({ row: -1, col: null, value: "" });
+  };
+
+  const handleEditCompleteCalAmount = (value: string) => {
+    setCalTotalAmount(Number(value));
   };
 
   useEffect(() => {
     setRatioCalcData(portfolioList);
+    setCalTotalAmount(portfolioData.snapshot.totalValue ?? 0);
   }, [portfolioList]);
 
   return (
@@ -89,57 +96,64 @@ export default function PortfolioList({
           <div className="flex-1 text-sm font-medium p-0.5 text-center">
             종목명
           </div>
-          <div className="w-16 text-xs text-center">목표 비중</div>
-          <div className="w-16 text-xs text-center">비중</div>
-          <div className="w-24 text-xs text-right font-bold">평가 금액</div>
+          <div className="w-12 text-xs text-right">목표 비중</div>
+          <div className="w-12 text-xs text-right">비중</div>
+          <div className="w-24 text-xs text-right">평가 금액</div>
           <div className="w-24 text-xs text-right">비중 차이</div>
         </div>
-        {ratioCalcData.map((stock, idx) => (
-          <div key={stock.name} className="flex items-center mb-2">
-            <div
-              className="w-3 h-3 rounded-full mr-2"
-              style={{ background: COLORS[idx] }}
-            />
-            <div className="flex-1 text-sm font-medium">{stock.name}</div>
-            <div className="w-16 text-xs text-gray-500 text-right">
-              <EditableCell
-                rowIdx={idx}
-                colName="targetRatio"
-                isNumber
-                edit={edit}
-                setEdit={setEdit}
-                item={stock}
-                onEditComplete={handleEditComplete}
+        {ratioCalcData.map((stock, idx) => {
+          const difference =
+            calTotalAmount * (stock.targetRatio ?? 0) - stock.valuationAmount;
+          const differenceColor =
+            difference > 0 ? "text-red-500" : "text-blue-500";
+
+          return (
+            <div key={stock.name} className="flex items-center mb-2">
+              <div
+                className="w-3 h-3 rounded-full mr-2"
+                style={{ background: COLORS[idx] }}
+              />
+              <div className="flex-1 text-sm font-medium">{stock.name}</div>
+              <div className="w-12 text-xs text-gray-500 text-right">
+                <EditableCell
+                  rowIdx={idx}
+                  colName="targetRatio"
+                  isNumber
+                  edit={editTargetRatio}
+                  setEdit={setEditTargetRatio}
+                  item={stock}
+                  onEditComplete={handleEditCompleteTargetRatio}
+                >
+                  {Math.round((stock.targetRatio ?? 0) * 1000) / 10}%
+                </EditableCell>
+              </div>
+              <div className="w-12 text-xs text-right text-gray-500">
+                {stock.currentRatio * 100}%
+              </div>
+              <div className="w-24 text-xs text-right font-bold">
+                {stock.valuationAmount.toLocaleString()} 원
+              </div>
+              <div
+                className={`w-24 text-xs text-right font-bold ${differenceColor}`}
               >
-                {((stock.targetRatio ?? 0) * 100).toFixed(0)}%
-              </EditableCell>
+                {Math.round(difference).toLocaleString()}원
+              </div>
             </div>
-            <div className="w-16 text-xs text-right text-gray-500">
-              {stock.currentRatio * 100}%
-            </div>
-            <div className="w-24 text-xs text-right font-bold">
-              {stock.valuationAmount.toLocaleString()} 원
-            </div>
-            <div className="w-24 text-xs text-right font-bold">
-              {(
-                portfolioData.snapshot.totalValue * (stock.targetRatio ?? 0) -
-                stock.valuationAmount
-              ).toLocaleString()}
-              원
-            </div>
-          </div>
-        ))}
+          );
+        })}
 
         <div className="flex items-center mb-2 bg-pink-100 rounded-sm">
           <div className="flex-1 text-sm font-medium p-0.5 text-center">
             합계
           </div>
-          <div className="w-16 text-xs text-right text-gray-500">
+          <div className={`w-16 text-xs text-right text-gray-500`}>
             {/* 목표 비중 */}
-            {ratioCalcData.reduce(
-              (acc, curr) => acc + (curr.targetRatio ?? 0),
-              0
-            ) * 100}
+            {(
+              ratioCalcData.reduce(
+                (acc, curr) => acc + (curr.targetRatio ?? 0),
+                0
+              ) * 100
+            ).toFixed(0)}
             %
           </div>
           <div className="w-16 text-xs text-right text-gray-500">100%</div>
@@ -149,15 +163,22 @@ export default function PortfolioList({
           </div>
           <div className="w-24 text-xs text-right font-bold">
             {/* 비중 차이  */}
-            {portfolioData.snapshot.totalValue.toFixed(0).toLocaleString()} 원
+
+            <SimpleEditableCell<number>
+              isNumber
+              value={calTotalAmount}
+              setValue={setCalTotalAmount}
+              onEditComplete={handleEditCompleteCalAmount}
+            >
+              {calTotalAmount.toLocaleString()} 원
+            </SimpleEditableCell>
           </div>
         </div>
       </section>
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2 w-full">
         <Button onClick={handleClickSaveButton}>
           {saveLoading ? "저장 중.." : "목표 비중 저장"}
         </Button>
-        <Button>비중 계산기</Button>
       </div>
     </>
   );
