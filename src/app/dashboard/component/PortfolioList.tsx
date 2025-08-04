@@ -1,3 +1,4 @@
+import { TabType } from "@/app/page";
 import EditableCell from "@/app/upload/components/EditableCell";
 import SimpleEditableCell from "@/app/upload/components/SimpleEditableCell";
 import { Button } from "@/components/ui/button";
@@ -8,8 +9,10 @@ import { useEffect, useState } from "react";
 
 export default function PortfolioList({
   portfolioData,
+  tab,
 }: {
   portfolioData: GetPortfolioResponse;
+  tab: TabType;
 }) {
   const portfolioList = portfolioData.snapshot.items;
 
@@ -96,16 +99,33 @@ export default function PortfolioList({
           <div className="flex-1 text-sm font-medium p-0.5 text-center">
             종목명
           </div>
-          <div className="w-12 text-xs text-right">목표 비중</div>
-          <div className="w-12 text-xs text-right">비중</div>
+          {tab === "ratio" && (
+            <div className="w-12 text-xs text-right">목표 비중</div>
+          )}
+          {tab === "ratio" && (
+            <div className="w-12 text-xs text-right">비중</div>
+          )}
+
+          {tab === "amount" && (
+            <div className="w-12 text-xs text-right">수익률</div>
+          )}
+          {tab === "amount" && (
+            <div className="w-24 text-xs text-right">평가 손익</div>
+          )}
           <div className="w-24 text-xs text-right">평가 금액</div>
-          <div className="w-24 text-xs text-right">비중 차이</div>
+
+          {tab === "ratio" && (
+            <div className="w-24 text-xs text-right">비중 차이</div>
+          )}
         </div>
         {ratioCalcData.map((stock, idx) => {
           const difference =
             calTotalAmount * (stock.targetRatio ?? 0) - stock.valuationAmount;
           const differenceColor =
             difference > 0 ? "text-red-500" : "text-blue-500";
+
+          const gainLossColor =
+            stock.gainLoss > 0 ? "text-red-500" : "text-blue-500";
 
           return (
             <div key={stock.name} className="flex items-center mb-2">
@@ -114,30 +134,50 @@ export default function PortfolioList({
                 style={{ background: COLORS[idx] }}
               />
               <div className="flex-1 text-sm font-medium">{stock.name}</div>
-              <div className="w-12 text-xs text-gray-500 text-right">
-                <EditableCell
-                  rowIdx={idx}
-                  colName="targetRatio"
-                  isNumber
-                  edit={editTargetRatio}
-                  setEdit={setEditTargetRatio}
-                  item={stock}
-                  onEditComplete={handleEditCompleteTargetRatio}
-                >
-                  {Math.round((stock.targetRatio ?? 0) * 1000) / 10}%
-                </EditableCell>
-              </div>
-              <div className="w-12 text-xs text-right text-gray-500">
-                {stock.currentRatio * 100}%
-              </div>
+              {tab === "ratio" && (
+                <div className="w-12 text-xs text-gray-500 text-right">
+                  <EditableCell
+                    rowIdx={idx}
+                    colName="targetRatio"
+                    isNumber
+                    edit={editTargetRatio}
+                    setEdit={setEditTargetRatio}
+                    item={stock}
+                    onEditComplete={handleEditCompleteTargetRatio}
+                  >
+                    {Math.round((stock.targetRatio ?? 0) * 1000) / 10}%
+                  </EditableCell>
+                </div>
+              )}
+              {tab === "ratio" && (
+                <div className="w-12 text-xs text-right text-gray-500">
+                  {stock.currentRatio * 100}%
+                </div>
+              )}
+
+              {tab === "amount" && (
+                <div className={`w-24 text-xs text-right ${gainLossColor}`}>
+                  {stock.rateOfReturn} %
+                </div>
+              )}
+
+              {tab === "amount" && (
+                <div className={`w-24 text-xs text-right ${gainLossColor}`}>
+                  {stock.gainLoss.toLocaleString()} 원
+                </div>
+              )}
+
               <div className="w-24 text-xs text-right font-bold">
                 {stock.valuationAmount.toLocaleString()} 원
               </div>
-              <div
-                className={`w-24 text-xs text-right font-bold ${differenceColor}`}
-              >
-                {Math.round(difference).toLocaleString()}원
-              </div>
+
+              {tab === "ratio" && (
+                <div
+                  className={`w-24 text-xs text-right font-bold ${differenceColor}`}
+                >
+                  {Math.round(difference).toLocaleString()}원
+                </div>
+              )}
             </div>
           );
         })}
@@ -146,40 +186,61 @@ export default function PortfolioList({
           <div className="flex-1 text-sm font-medium p-0.5 text-center">
             합계
           </div>
-          <div className={`w-16 text-xs text-right text-gray-500`}>
-            {/* 목표 비중 */}
-            {(
-              ratioCalcData.reduce(
-                (acc, curr) => acc + (curr.targetRatio ?? 0),
-                0
-              ) * 100
-            ).toFixed(0)}
-            %
-          </div>
-          <div className="w-16 text-xs text-right text-gray-500">100%</div>
+          {tab === "ratio" && (
+            <div className={`w-16 text-xs text-right text-gray-500`}>
+              {/* 목표 비중 */}
+              {(
+                ratioCalcData.reduce(
+                  (acc, curr) => acc + (curr.targetRatio ?? 0),
+                  0
+                ) * 100
+              ).toFixed(0)}
+              %
+            </div>
+          )}
+          {tab === "ratio" && (
+            <div className="w-16 text-xs text-right text-gray-500">100%</div>
+          )}
+
+          {tab === "amount" && (
+            <div className="w-16 text-xs text-right text-gray-500">
+              {portfolioData.snapshot.totalRateOfReturn.toFixed(0)} %
+            </div>
+          )}
+
+          {tab === "amount" && (
+            <div className="w-24 text-xs text-right text-gray-500">
+              {portfolioData.snapshot.totalGainLoss.toLocaleString()} 원
+            </div>
+          )}
+
           <div className="w-24 text-xs text-right font-bold">
             {/* 평가금액 */}
             {portfolioData.snapshot.totalValue.toLocaleString()} 원
           </div>
-          <div className="w-24 text-xs text-right font-bold">
-            {/* 비중 차이  */}
+          {tab === "ratio" && (
+            <div className="w-24 text-xs text-right font-bold">
+              {/* 비중 차이  */}
 
-            <SimpleEditableCell<number>
-              isNumber
-              value={calTotalAmount}
-              setValue={setCalTotalAmount}
-              onEditComplete={handleEditCompleteCalAmount}
-            >
-              {calTotalAmount.toLocaleString()} 원
-            </SimpleEditableCell>
-          </div>
+              <SimpleEditableCell<number>
+                isNumber
+                value={calTotalAmount}
+                setValue={setCalTotalAmount}
+                onEditComplete={handleEditCompleteCalAmount}
+              >
+                {calTotalAmount.toLocaleString()} 원
+              </SimpleEditableCell>
+            </div>
+          )}
         </div>
       </section>
-      <div className="flex justify-end gap-2 w-full">
-        <Button onClick={handleClickSaveButton}>
-          {saveLoading ? "저장 중.." : "목표 비중 저장"}
-        </Button>
-      </div>
+      {tab === "ratio" && (
+        <div className="flex justify-end gap-2 w-full">
+          <Button onClick={handleClickSaveButton}>
+            {saveLoading ? "저장 중.." : "목표 비중 저장"}
+          </Button>
+        </div>
+      )}
     </>
   );
 }

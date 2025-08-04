@@ -1,10 +1,11 @@
 "use client";
-import PortfolioList from "@/app/dashboard/component/PortfolioList";
+
 import PortfolioSummary from "@/app/dashboard/component/PortfolioSummary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDateWithDay } from "@/lib/date";
 import { GetPortfolioResponse } from "@/type/portfolio";
 import { useEffect, useState } from "react";
+import PortfolioList from "./dashboard/component/PortfolioList";
 import Total from "./dashboard/component/Total";
 
 export interface PortfolioProps {
@@ -12,8 +13,8 @@ export interface PortfolioProps {
   tab: TabType;
 }
 export const TAB_VALUES = {
-  RATIO: { value: "ratio", label: "비중" },
   AMOUNT: { value: "amount", label: "금액" },
+  RATIO: { value: "ratio", label: "비중" },
 } as const;
 
 export type TabType = (typeof TAB_VALUES)[keyof typeof TAB_VALUES]["value"]; //
@@ -40,7 +41,7 @@ export default function Dashboard() {
       createdAt: new Date(),
     },
   });
-  const [tab, setTab] = useState<TabType>(TAB_VALUES.RATIO.value);
+  const [tab, setTab] = useState<TabType>(TAB_VALUES.AMOUNT.value);
 
   useEffect(() => {
     // 실제 API 호출
