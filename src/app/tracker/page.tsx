@@ -2,7 +2,6 @@
 
 import Title from "@/components/Title";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 
 export default function TrackerPage() {
   const handleClickSlackTest = async () => {
@@ -37,23 +36,30 @@ export default function TrackerPage() {
 
   const createKISToken = async () => {
     try {
-      // const response = await fetch("/api/kis/create-token", {
-      //   method: "POST",
-      // });
-
-      const response = await axios.post("/api/kis/auth", {
+      const response = await fetch("/api/kis/auth", {
         method: "POST",
       });
 
-      if (!response) {
-        console.error("토큰 생성 실패:", response);
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("KIS 토큰 생성 실패:", errorData.error);
         return;
       }
 
-      const data = response.data;
+      const data = await response.json();
       console.log("KIS 토큰 생성 성공:", data);
+
+      // 클라이언트에서 토큰을 localStorage에 저장
+      if (data.success && data.token) {
+        try {
+          localStorage.setItem("kis_token", JSON.stringify(data.token));
+          console.log("토큰이 localStorage에 저장되었습니다.");
+        } catch (storageError) {
+          console.error("localStorage 저장 에러:", storageError);
+        }
+      }
     } catch (error) {
-      console.error("토큰 생성 에러:", error);
+      console.error("KIS 토큰 생성 중 에러:", error);
     }
   };
 

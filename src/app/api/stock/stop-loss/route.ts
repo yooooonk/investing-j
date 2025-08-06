@@ -1,4 +1,4 @@
-import { KISStockService } from "@/services/kisStockService";
+import { KISServerService } from "@/services/kisServerService";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -17,8 +17,8 @@ export async function GET(req: NextRequest) {
 
     console.log("주식 일별 시세 조회 시작:", { stockCode, startDate, endDate });
 
-    // KISStockService를 사용하여 일별 시세 조회
-    const priceHistory = await KISStockService.getDailyPriceHistory(
+    // KISServerService를 사용하여 일별 시세 조회
+    const priceHistory = await KISServerService.getDailyPriceHistory(
       stockCode,
       startDate,
       endDate
