@@ -2,9 +2,10 @@
 import PortfolioList from "@/app/dashboard/component/PortfolioList";
 import PortfolioSummary from "@/app/dashboard/component/PortfolioSummary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { usePortfolio } from "@/contexts/portfolioContext";
 import { formatDateWithDay } from "@/lib/date";
 import { GetPortfolioResponse } from "@/type/portfolio";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Total from "./dashboard/component/Total";
 
 export interface PortfolioProps {
@@ -19,41 +20,16 @@ export const TAB_VALUES = {
 export type TabType = (typeof TAB_VALUES)[keyof typeof TAB_VALUES]["value"]; //
 
 export default function Dashboard() {
-  const [portfolioData, setPortfolioData] = useState<GetPortfolioResponse>({
-    portfolio: {
-      id: "",
-      userId: "",
-      name: "",
-      currency: "KRW",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isActive: true,
-    },
-    snapshot: {
-      id: "",
-      portfolioId: "",
-      date: "",
-      items: [],
-      totalValue: 0,
-      totalGainLoss: 0,
-      totalRateOfReturn: 0,
-      createdAt: new Date(),
-    },
-  });
+  const { portfolioData } = usePortfolio();
   const [tab, setTab] = useState<TabType>(TAB_VALUES.RATIO.value);
 
-  useEffect(() => {
-    // 실제 API 호출
-    fetch("/api/portfolio")
-      .then((res) => res.json())
-      .then((data) => {
-        setPortfolioData(data);
-      })
-      .catch((err) => {
-        // 에러 핸들링
-        console.error("포트폴리오 데이터 불러오기 실패:", err);
-      });
-  }, []);
+  if (!portfolioData) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-500">포트폴리오 데이터가 없습니다.</div>
+      </div>
+    );
+  }
 
   return (
     <>

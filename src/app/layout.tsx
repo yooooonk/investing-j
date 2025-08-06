@@ -1,7 +1,8 @@
+import BottomNav from "@/components/BottomNav";
+import { PortfolioProvider } from "@/contexts/portfolioContext";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import BottomNav from "@/components/BottomNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,10 +29,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <main className="min-h-screen bg-white flex flex-col items-center px-2 py-4 max-w-md mx-auto relative">
-          {children}
-          <BottomNav />
-        </main>
+        <PortfolioProvider>
+          <main className="min-h-screen bg-white flex flex-col items-center px-2 py-4 max-w-md mx-auto relative">
+            {children}
+            <BottomNav />
+          </main>
+        </PortfolioProvider>
       </body>
     </html>
   );

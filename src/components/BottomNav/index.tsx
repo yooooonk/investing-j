@@ -1,10 +1,8 @@
-import React from "react";
 import Link from "next/link";
-import WalletIcon from "./icons/WalletIcon";
-import MarketIcon from "./icons/MarketIcon";
+import React from "react";
 import HomeIcon from "./icons/HomeIcon";
 import NotificationsIcon from "./icons/NotificationsIcon";
-import SettingsIcon from "./icons/SettingsIcon";
+import WalletIcon from "./icons/WalletIcon";
 
 type MenuItem = {
   label: string;
@@ -14,14 +12,14 @@ type MenuItem = {
 
 const menu: MenuItem[] = [
   { label: "Tracker", path: "/tracker", icon: <WalletIcon /> },
-  { label: "Market", path: "/market", icon: <MarketIcon /> },
+  // { label: "Market", path: "/market", icon: <MarketIcon /> },
   { label: "Home", path: "/", icon: <HomeIcon /> },
   {
     label: "upload",
     path: "/upload",
     icon: <NotificationsIcon />,
   },
-  { label: "Settings", path: "/settings", icon: <SettingsIcon /> },
+  // { label: "Settings", path: "/settings", icon: <SettingsIcon /> },
 ];
 
 const BottomNavItem = ({ icon, label, path }: MenuItem) => {
