@@ -28,7 +28,8 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
 
       if (data.ok) {
-        setPortfolioData(data);
+        const { ok, ...rest } = data;
+        setPortfolioData(rest as GetPortfolioResponse);
       } else {
         setError(data.error);
       }

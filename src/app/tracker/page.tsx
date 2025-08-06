@@ -2,8 +2,32 @@
 
 import Title from "@/components/Title";
 import { Button } from "@/components/ui/button";
+import { usePortfolio } from "@/contexts/portfolioContext";
+import { StockItem } from "@/type/stock";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 export default function TrackerPage() {
+  const { portfolioData } = usePortfolio();
+
+  const { snapshot } = portfolioData || {};
+
+  const stockList = snapshot?.items.map((item: StockItem) => ({
+    stockName: item.name,
+    stockCode: item.code,
+    buyingPrice: item.averagePurchasePrice,
+    maxPrice: 10000, //maxPrice-currentPrice,
+    currentPrice: 20000,
+  }));
+
   const handleClickSlackTest = async () => {
     const response = await fetch("/api/tracker/noti", {
       method: "POST",
@@ -64,16 +88,44 @@ export default function TrackerPage() {
   };
 
   return (
-    <div className="flex items-center justify-center w-full">
+    <div className="flex flex-col items-center justify-center w-full">
       <Title>
         <span role="img" aria-label="robot">
           🤖
         </span>
         Tracker
       </Title>
-      <Button onClick={() => handleClickSlackTest()}>slack 전송 테스트</Button>
-      <Button onClick={() => getDailyPriceHistory()}>조회 테스트</Button>
-      <Button onClick={() => createKISToken()}>KIS 토큰 생성</Button>
+      <div>
+        <Button onClick={() => handleClickSlackTest()}>
+          slack 전송 테스트
+        </Button>
+        <Button onClick={() => getDailyPriceHistory()}>조회 테스트</Button>
+        <Button onClick={() => createKISToken()}>KIS 토큰 생성</Button>
+      </div>
+      <div className="w-full h-96 mt-4">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            width={500}
+            height={300}
+            data={stockList}
+            margin={{
+              top: 20,
+              right: 15,
+              left: 0,
+              bottom: 5,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="stockName" fontSize={10} />
+            <YAxis fontSize={10} />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="currentPrice" stackId="a" fill="#8884d8" />
+            <Bar dataKey="maxPrice" stackId="a" fill="#82ca9d" />
+            <Bar dataKey="buyingPrice" fill="#ffc658" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
