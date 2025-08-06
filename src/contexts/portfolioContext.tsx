@@ -42,11 +42,8 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     }
   };
+
   useEffect(() => {
-    console.log("portfolioData", portfolioData);
-  }, [portfolioData]);
-  useEffect(() => {
-    console.log("gg");
     fetchPortfolio();
   }, []);
 
